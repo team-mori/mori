@@ -13,7 +13,7 @@ export default function CalendarLine({ data }: { data: { date: string; rate: num
             <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#64748b" }} />
             <YAxis tick={{ fontSize: 11, fill: "#64748b" }} unit="%" />
             <Tooltip />
-            <Line type="monotone" dataKey="rate" stroke="#8b5cf6" strokeWidth={2} dot={{ r: 3 }} />
+            <Line type="monotone" dataKey="rate" stroke="#2B3A55" strokeWidth={2} dot={{ r: 3 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

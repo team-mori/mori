@@ -1,0 +1,313 @@
+/* MORI 모리 -- Design Tokens
+ *
+ * Two layers:
+ *   1. Primitive palette + raw type -- never reference these directly in product code.
+ *   2. Semantic tokens (--fg-1, --bg-1, --line, --remind-*, --text-h1, etc.) -- use these.
+ *
+ * Brand voice is "조용히 신뢰감 있는 비서" -- calm, paper-and-ink, single strong neutral.
+ * No gradients. No neon. No red. Single accent green for "qualification met".
+ */
+
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+@import url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfontloader/css/wanted-sans.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import url("https://cdn.jsdelivr.net/gh/innks/Paperlogy/dist/Paperlogy.css");
+
+:root {
+  /* ==== 1. Primitives ==== */
+
+  /* Ink -- the strong neutral. Midnight indigo, slightly warm. */
+  --ink-950: #0F172A;   /* page text on light, sidebar bg */
+  --ink-900: #1F2937;   /* primary brand surface (admin sidebar) */
+  --ink-800: #2B3A55;   /* primary text on light surfaces */
+  --ink-700: #475569;   /* secondary text */
+  --ink-600: #64748B;   /* tertiary text, axis labels */
+  --ink-500: #94A3B8;   /* placeholder, disabled label */
+  --ink-400: #CBD5E1;   /* hairline borders */
+  --ink-300: #E2E8F0;   /* dividers, chart grid */
+  --ink-200: #EEF1F5;   /* hover wash */
+  --ink-100: #F4F5F7;   /* card-on-card surface */
+
+  /* Paper -- warm whites. Avoids the cold-grey of admin portals. */
+  --paper-0:  #FFFFFF;
+  --paper-50: #FAFAF7;  /* page background */
+  --paper-100:#F5F4EE;  /* subtle wash */
+
+  /* Remind accents -- tied to qualification + deadline state. Single strong green only. */
+  --remind-green-700: #047857;
+  --remind-green-600: #10B981;  /* tone-down used at 600 weight */
+  --remind-green-100: #ECFDF5;
+  --remind-green-50:  #F0FDF4;
+
+  --remind-amber-700: #B45309;
+  --remind-amber-600: #D97706;  /* deadline approaching */
+  --remind-amber-100: #FEF3C7;
+  --remind-amber-50:  #FFFBEB;
+
+  /* Soft grey for "ineligible" -- never red. */
+  --remind-mute-700: #475569;
+  --remind-mute-100: #E2E8F0;
+  --remind-mute-50:  #F1F5F9;
+
+  /* New-notification accent: tinted version of the brand neutral, NOT a separate hue. */
+  --remind-new-700: #2B3A55;
+  --remind-new-100: #E5EAF1;
+
+  /* ==== 2. Semantic tokens ==== */
+
+  /* Surfaces */
+  --bg-page:    var(--paper-50);
+  --bg-surface: var(--paper-0);
+  --bg-sunken:  var(--ink-100);
+  --bg-inverse: var(--ink-900);   /* dept admin sidebar */
+
+  /* Foreground */
+  --fg-1: var(--ink-800);  /* body */
+  --fg-2: var(--ink-700);  /* secondary */
+  --fg-3: var(--ink-600);  /* tertiary, captions */
+  --fg-4: var(--ink-500);  /* labels, dt, placeholders */
+  --fg-on-inverse: #E5EAF1;
+  --fg-on-accent:  #FFFFFF;
+
+  /* Lines */
+  --line-1: var(--ink-300);   /* default border, card edge */
+  --line-2: var(--ink-200);   /* divider */
+  --line-strong: var(--ink-400);
+
+  /* Brand */
+  --brand:      var(--ink-800);   /* MORI primary -- midnight indigo */
+  --brand-deep: var(--ink-900);
+  --brand-tint: var(--remind-new-100);
+
+  /* Reminder semantic -- what every state means */
+  --state-eligible-fg:   var(--remind-green-700);
+  --state-eligible-bg:   var(--remind-green-100);
+  --state-due-soon-fg:   var(--remind-amber-700);
+  --state-due-soon-bg:   var(--remind-amber-100);
+  --state-ineligible-fg: var(--remind-mute-700);
+  --state-ineligible-bg: var(--remind-mute-100);
+  --state-new-fg:        var(--remind-new-700);
+  --state-new-bg:        var(--remind-new-100);
+
+  /* Radii */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;   /* card minimum */
+  --radius-lg: 16px;   /* card maximum */
+  --radius-pill: 999px;
+
+  /* Spacing -- 4px base */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Elevation -- paper-on-paper, never dramatic. */
+  --shadow-flat: 0 0 0 1px var(--line-1);
+  --shadow-1:    0 1px 2px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(15, 23, 42, 0.04);
+  --shadow-2:    0 2px 6px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(15, 23, 42, 0.05);
+  --shadow-pop:  0 12px 32px -12px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.06);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 280ms;
+
+  /* Type stack
+   *  --font-sans     Pretendard -- default for Korean + Latin body & UI.
+   *  --font-sans-alt Wanted Sans -- secondary KR sans for editorial/admin surfaces
+   *                  where we want a slightly more geometric tone (charts, tables,
+   *                  callout headers). Same metrics ballpark as Pretendard.
+   *  --font-num      Inter -- reserved for the visual stars: D-day numerals & amounts.
+   *                  Tabular nums on, weight 700–800. Latin-only -- paired with
+   *                  Pretendard for any KR units that follow.
+   *  --font-display  Paperlogy -- landing-page headline only. One-line main copy.
+   *                  NEVER body, never card titles, never repeated elements.
+   *  --font-mono     JetBrains Mono -- tabular utility on admin tables/code only.
+   */
+  --font-sans:     "Pretendard", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans-alt: "Wanted Sans", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  --font-num:      "Inter", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  --font-display:  "Paperlogy", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:     "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Type scale */
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-15: 15px;   /* body min */
+  --fs-16: 16px;   /* body */
+  --fs-18: 18px;   /* card title min */
+  --fs-20: 20px;   /* card title max */
+  --fs-24: 24px;
+  --fs-28: 28px;   /* page title min */
+  --fs-32: 32px;   /* page title max */
+  --fs-40: 40px;
+  --fs-56: 56px;   /* D-day hero numeric */
+  --fs-72: 72px;
+
+  --lh-tight: 1.25;
+  --lh-snug:  1.4;
+  --lh-base:  1.6;   /* brand floor */
+  --lh-loose: 1.75;
+
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semi:    600;
+  --fw-bold:    700;
+  --fw-extra:   800;
+
+  /* Letter-spacing */
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+  --tracking-eyebrow: 0.16em;  /* MORI - 모리 wordmark eyebrow */
+}
+
+/* ==== 3. Element defaults ==== */
+
+html, body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-16);
+  line-height: var(--lh-base);
+  color: var(--fg-1);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headings -- Pretendard, tight tracking, semibold/bold. */
+h1, .text-h1 {
+  font-size: var(--fs-32);
+  line-height: var(--lh-tight);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+}
+h2, .text-h2 {
+  font-size: var(--fs-24);
+  line-height: var(--lh-snug);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+}
+h3, .text-h3 {
+  font-size: var(--fs-20);
+  line-height: var(--lh-snug);
+  font-weight: var(--fw-semi);
+  color: var(--fg-1);
+}
+h4, .text-h4 {
+  font-size: var(--fs-18);
+  line-height: var(--lh-snug);
+  font-weight: var(--fw-semi);
+  color: var(--fg-1);
+}
+
+p, .text-body {
+  font-size: var(--fs-16);
+  line-height: var(--lh-base);
+  color: var(--fg-1);
+  text-wrap: pretty;
+}
+.text-body-sm {
+  font-size: var(--fs-14);
+  line-height: var(--lh-base);
+  color: var(--fg-2);
+}
+.text-caption {
+  font-size: var(--fs-13);
+  line-height: var(--lh-snug);
+  color: var(--fg-3);
+}
+.text-eyebrow {
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semi);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+/* The visual stars: D-day numerics + amounts. Inter, tighter tracking, tabular. */
+.text-dday {
+  font-family: var(--font-num);
+  font-size: var(--fs-56);
+  font-weight: var(--fw-extra);
+  line-height: 1;
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "cv11" 1;  /* Inter cv11 = single-storey 4 */
+}
+.text-dday-unit {
+  font-family: var(--font-sans);  /* unit is KR (일, 주, 개월) -- stay on Pretendard */
+  font-size: var(--fs-18);
+  font-weight: var(--fw-semi);
+  color: var(--fg-3);
+  letter-spacing: var(--tracking-tight);
+}
+.text-amount {
+  font-family: var(--font-num);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-tight);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  color: var(--fg-1);
+}
+.text-amount-unit {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semi);
+  color: var(--fg-3);
+}
+
+/* Display -- Paperlogy. Landing headline only. */
+.text-display {
+  font-family: var(--font-display);
+  font-size: var(--fs-72);
+  font-weight: var(--fw-extra);
+  line-height: 1.1;
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+  text-wrap: balance;
+}
+
+/* Editorial -- Wanted Sans. Slightly more geometric KR sans for admin headers. */
+.text-editorial {
+  font-family: var(--font-sans-alt);
+  font-feature-settings: "ss06" 1;  /* Wanted Sans 세로모 alt */
+}
+.text-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Code */
+code, .text-code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--bg-sunken);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  color: var(--fg-1);
+}
+
+/* Links -- quiet underline, brand on hover */
+a {
+  color: var(--brand);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+a:hover { color: var(--brand-deep); }
+
+::selection {
+  background: var(--state-new-bg);
+  color: var(--brand-deep);
+}

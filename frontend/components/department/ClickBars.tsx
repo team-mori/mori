@@ -12,7 +12,7 @@ export default function ClickBars({ data }: { data: { title: string; clicks: num
             <XAxis type="number" hide />
             <YAxis type="category" dataKey="title" width={140} tick={{ fontSize: 11, fill: "#64748b" }} />
             <Tooltip />
-            <Bar dataKey="clicks" fill="#f97316" radius={[0, 6, 6, 0]} />
+            <Bar dataKey="clicks" fill="#D97706" radius={[0, 6, 6, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

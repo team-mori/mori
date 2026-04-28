@@ -14,7 +14,7 @@ export default function ReachDonut({ rate, reached, total }: { rate: number; rea
         <ResponsiveContainer>
           <PieChart>
             <Pie data={data} dataKey="value" innerRadius={50} outerRadius={70} startAngle={90} endAngle={-270}>
-              <Cell fill="#0284c7" />
+              <Cell fill="#2B3A55" />
               <Cell fill="#e2e8f0" />
             </Pie>
           </PieChart>

@@ -71,7 +71,7 @@ export default function NoticeCard({ notice, status, onToggleStatus, onToast }: 
         </div>
         <div className="flex">
           <dt className="w-20 shrink-0 text-slate-400">원문</dt>
-          <dd><a href={notice.source_url} target="_blank" className="text-emerald-700 underline">바로가기</a></dd>
+          <dd><a href={notice.source_url} target="_blank" className="text-brand underline">바로가기</a></dd>
         </div>
       </dl>
 
@@ -82,8 +82,8 @@ export default function NoticeCard({ notice, status, onToggleStatus, onToast }: 
         </button>
         <button onClick={() => onToggleStatus(nextStatus())}
           className={`flex-1 inline-flex items-center justify-center gap-1 rounded-lg px-3 py-2 text-xs font-semibold ${
-            status === "completed" ? "bg-emerald-600 text-white" :
-            status === "planning" ? "bg-emerald-100 text-emerald-800" :
+            status === "completed" ? "bg-eligible-fg text-white" :
+            status === "planning" ? "bg-brand-tint text-brand" :
             "border border-slate-200 text-slate-700 hover:bg-slate-50"
           }`}>
           {status === "completed" ? <><Check size={14}/> 완료</> :

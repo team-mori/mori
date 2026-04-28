@@ -1,10 +1,146 @@
+/* MORI 디자인 시스템 토큰 + 폰트.
+ * 출처: Claude Design handoff (mori-design-system).
+ * 브랜드: 미드나잇 인디고 #2B3A55, 빨강 절대 금지, 단일 강조 그린.
+ */
+
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+@import url("https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfontloader/css/wanted-sans.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import url("https://cdn.jsdelivr.net/gh/innks/Paperlogy/dist/Paperlogy.css");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Ink — strong neutral, midnight indigo */
+  --ink-950: #0F172A;
+  --ink-900: #1F2937;
+  --ink-800: #2B3A55;
+  --ink-700: #475569;
+  --ink-600: #64748B;
+  --ink-500: #94A3B8;
+  --ink-400: #CBD5E1;
+  --ink-300: #E2E8F0;
+  --ink-200: #EEF1F5;
+  --ink-100: #F4F5F7;
+
+  /* Paper — warm whites */
+  --paper-0:  #FFFFFF;
+  --paper-50: #FAFAF7;
+  --paper-100: #F5F4EE;
+
+  /* Reminder semantic — qualification + deadline state */
+  --remind-green-700: #047857;
+  --remind-green-600: #10B981;
+  --remind-green-100: #ECFDF5;
+  --remind-amber-700: #B45309;
+  --remind-amber-600: #D97706;
+  --remind-amber-100: #FEF3C7;
+  --remind-mute-700:  #475569;
+  --remind-mute-100:  #E2E8F0;
+  --remind-new-700:   #2B3A55;
+  --remind-new-100:   #E5EAF1;
+
+  /* Semantic surfaces / fg */
+  --bg-page:    var(--paper-50);
+  --bg-surface: var(--paper-0);
+  --bg-sunken:  var(--ink-100);
+  --bg-inverse: var(--ink-900);
+  --fg-1: var(--ink-800);
+  --fg-2: var(--ink-700);
+  --fg-3: var(--ink-600);
+  --fg-4: var(--ink-500);
+  --line-1: var(--ink-300);
+  --line-2: var(--ink-200);
+  --line-strong: var(--ink-400);
+
+  --brand:      var(--ink-800);
+  --brand-deep: var(--ink-900);
+  --brand-tint: var(--remind-new-100);
+
+  --state-eligible-fg:   var(--remind-green-700);
+  --state-eligible-bg:   var(--remind-green-100);
+  --state-due-soon-fg:   var(--remind-amber-700);
+  --state-due-soon-bg:   var(--remind-amber-100);
+  --state-ineligible-fg: var(--remind-mute-700);
+  --state-ineligible-bg: var(--remind-mute-100);
+  --state-new-fg:        var(--remind-new-700);
+  --state-new-bg:        var(--remind-new-100);
+
+  /* Radii */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Shadows — paper-on-paper, never dramatic */
+  --shadow-flat: 0 0 0 1px var(--line-1);
+  --shadow-1:    0 1px 2px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(15, 23, 42, 0.04);
+  --shadow-2:    0 2px 6px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(15, 23, 42, 0.05);
+  --shadow-pop:  0 12px 32px -12px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.06);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 280ms;
+
+  /* Type stack */
+  --font-sans:     "Pretendard", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans-alt: "Wanted Sans", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  --font-num:      "Inter", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  --font-display:  "Paperlogy", "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:     "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 html, body {
-  font-family: Pretendard, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
+  background: var(--bg-page);
+  color: var(--fg-1);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* D-day 시각적 주인공 — Inter 52~56px tabular-nums */
+.text-dday {
+  font-family: var(--font-num);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+}
+.text-amount {
+  font-family: var(--font-num);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.text-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.text-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.text-h1 {
+  font-size: 32px; line-height: 1.25; font-weight: 700; letter-spacing: -0.02em;
+}
+.text-h2 {
+  font-size: 24px; line-height: 1.4; font-weight: 700; letter-spacing: -0.02em;
+}
+.text-h3 {
+  font-size: 20px; line-height: 1.4; font-weight: 600;
+}
+
+::selection {
+  background: var(--state-new-bg);
+  color: var(--brand-deep);
 }

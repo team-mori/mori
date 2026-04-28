@@ -81,8 +81,8 @@ export default function StudentDemo() {
     <main className="min-h-screen bg-slate-50">
       <header className="bg-white border-b">
         <div className="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-emerald-700">모리</Link>
-          <div className="h-9 w-9 rounded-full bg-emerald-100 grid place-items-center text-emerald-700 font-bold">학</div>
+          <Link href="/" className="text-xl font-bold text-brand">모리</Link>
+          <div className="h-9 w-9 rounded-full bg-brand-tint grid place-items-center text-brand font-bold">학</div>
         </div>
       </header>
 
@@ -90,11 +90,11 @@ export default function StudentDemo() {
         <div className="bg-white rounded-2xl border p-5">
           <p className="text-xs text-slate-400">이번 학기 모리에서 챙긴 기회</p>
           <div className="mt-2 flex items-center gap-5 text-sm">
-            <span><b className="text-emerald-700 text-xl">{counts.planning}</b> 신청 예정</span>
-            <span><b className="text-slate-800 text-xl">{counts.completed}</b> 신청 완료</span>
+            <span><b className="text-brand text-xl text-amount">{counts.planning}</b> 신청 예정</span>
+            <span><b className="text-eligible-fg text-xl text-amount">{counts.completed}</b> 신청 완료</span>
             <button onClick={() => setShowRegret(true)} className="text-left">
-              <b className="text-red-600 text-xl">{counts.missed}</b>
-              <span className="text-red-600 ml-1 underline">놓친 기회</span>
+              <b className="text-ineligible-fg text-xl text-amount">{counts.missed}</b>
+              <span className="text-ineligible-fg ml-1 underline">지나간 기회</span>
             </button>
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function StudentDemo() {
             <button key={t.key} onClick={() => setTab(t.key as any)}
               className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap ${
                 tab === t.key
-                  ? "bg-emerald-600 text-white"
+                  ? "bg-brand-deep text-white"
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-100"
               }`}>
               {t.key === "all" ? "전체" : CATEGORY_LABEL[t.key as Category]}

@@ -41,19 +41,19 @@ export default function SignupForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="이메일을 입력해주세요"
-          className="flex-1 rounded-lg border border-slate-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          className="flex-1 rounded-lg border border-line-1 bg-paper-0 px-4 py-3 text-base text-ink-800 placeholder:text-fg-4 focus:outline-none focus:ring-2 focus:ring-brand"
         />
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="rounded-lg bg-brand-deep px-5 py-3 font-semibold text-white hover:bg-ink-950 disabled:opacity-50 transition-colors"
         >
           {loading ? "등록 중..." : "사전 등록"}
         </button>
       </form>
-      {msg && <p className="mt-3 text-sm text-emerald-700">{msg}</p>}
+      {msg && <p className="mt-3 text-sm text-eligible-fg">{msg}</p>}
       {count >= 50 && (
-        <p className="mt-3 text-sm text-slate-500">현재 {count}명이 기다리고 있어요</p>
+        <p className="mt-3 text-sm text-fg-3">현재 {count}명이 기다리고 있어요</p>
       )}
     </div>
   );

@@ -14,9 +14,10 @@ export default function TrendLine({ data }: { data: TrendPoint[] }) {
           <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#71717a" }} />
           <YAxis tick={{ fontSize: 11, fill: "#71717a" }} />
           <Tooltip />
-          <Line type="monotone" dataKey="reach" stroke="#0ea5e9" strokeWidth={2} dot={false} name="도달" />
-          <Line type="monotone" dataKey="open" stroke="#a855f7" strokeWidth={2} dot={false} name="열람" />
-          <Line type="monotone" dataKey="planning" stroke="#f97316" strokeWidth={2} dot={false} name="신청예정" />
+          {/* 디자인 가이드: 단일 neutral + semantic green/amber. */}
+          <Line type="monotone" dataKey="reach" stroke="#94A3B8" strokeWidth={2} dot={false} name="도달" />
+          <Line type="monotone" dataKey="open" stroke="#2B3A55" strokeWidth={2} dot={false} name="열람" />
+          <Line type="monotone" dataKey="planning" stroke="#D97706" strokeWidth={2} dot={false} name="신청예정" />
         </LineChart>
       </ResponsiveContainer>
     </div>

@@ -2,12 +2,14 @@
 
 import type { DeptData } from "@/lib/mock/department";
 
+// Claude Design 가이드: 차트 팔레트도 단일 neutral + semantic green/amber.
+// violet/orange/sky 제거 → ink + due-soon + eligible.
 const STAGES = [
-  { key: "reach", label: "도달", color: "bg-sky-500" },
-  { key: "open", label: "열람", color: "bg-sky-600" },
-  { key: "calendar", label: "캘린더", color: "bg-violet-500" },
-  { key: "planning", label: "신청 예정", color: "bg-orange-400" },
-  { key: "completed", label: "신청 완료", color: "bg-emerald-600" },
+  { key: "reach", label: "도달", color: "bg-ink-400" },
+  { key: "open", label: "열람", color: "bg-ink-600" },
+  { key: "calendar", label: "캘린더", color: "bg-brand" },
+  { key: "planning", label: "신청 예정", color: "bg-due-soon-fg" },
+  { key: "completed", label: "신청 완료", color: "bg-eligible-fg" },
 ] as const;
 
 export default function FunnelTable({ funnel }: { funnel: DeptData["funnel"] }) {

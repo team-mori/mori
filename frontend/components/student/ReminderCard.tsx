@@ -1,165 +1,187 @@
 "use client";
 
-// v2 ReminderCard — 모리의 핵심 UI.
+// ReminderCard — Claude Design handoff 디자인 그대로 구현.
 //
-// v1 NoticeCard 와 차이:
-//   - D-day 가 시각적 주인공 (대형 숫자, 좌상단)
-//   - 자격 라벨 (fit/gap/unknown/unfit) 우상단
-//   - 빨강 금지 — 임박 = amber, 미달 = 회색
-//   - confidence < 0.8 시 "확인 필요" 라벨
-//   - shadcn/ui 톤 (border 1px, 그림자 거의 없음)
-//   - 모바일 우선, 360px 최소 폭에서도 정상 동작
+// 계층:
+//   1) 카테고리 eyebrow + D-day 대형 숫자 (Inter 52px tabular-nums) | 우측: 캘린더 추가 원형 버튼
+//   2) 제목 (2줄 clamp — 카드 높이 일관성)
+//   3) 타깃 + EligibilityBadge (compact, 한 줄, 줄바꿈 금지)
+//   4) 금액 (점선 구분선 위, Inter, 인라인)
+//   5) 하단 단일 primary CTA (mt-auto 로 카드 하단에 고정)
+//
+// 빨강 절대 금지. D-day 색상: D-3 이하 amber, D-7 이하 brand-indigo, 그 외 fg-1.
+// 마감 지난 카드는 PastReminderCard 로 대체.
 
-import { Bell, BellOff, ExternalLink } from "lucide-react";
+import { Calendar, Check, CheckCircle2, Clock3, Plus } from "lucide-react";
 import type { ActionCard, MatchResult } from "@/lib/types";
 import { CATEGORY_LABEL } from "@/lib/categories";
+import EligibilityBadge, { statusToState } from "./EligibilityBadge";
 import { cn } from "@/lib/utils";
+
+type Status = "planning" | "completed" | null;
 
 type Props = {
   card: ActionCard;
   match: MatchResult;
+  status?: Status;
+  target?: string;
   onApply: () => void;
-  onSnooze: () => void;
-  onDismiss: () => void;
+  onAddCalendar?: () => void;
 };
 
-function dDay(deadline: string): { n: number; label: string } {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const end = new Date(deadline);
-  end.setHours(0, 0, 0, 0);
-  const n = Math.ceil((end.getTime() - today.getTime()) / 86400000);
-  const label = n === 0 ? "오늘" : n > 0 ? `D-${n}` : `마감`;
-  return { n, label };
+function dDay(deadline: string): { diff: number; label: string } {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const end = new Date(deadline); end.setHours(0, 0, 0, 0);
+  const diff = Math.ceil((end.getTime() - today.getTime()) / 86400000);
+  const label = diff === 0 ? "D-day" : diff > 0 ? `D-${diff}` : `D+${-diff}`;
+  return { diff, label };
 }
 
-const FIT_BADGE: Record<MatchResult["status"], { label: string; cls: string; icon: string }> = {
-  fit: { label: "자격 충족", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "✓" },
-  gap: { label: "일부 부족", cls: "bg-amber-50 text-amber-800 border-amber-200", icon: "!" },
-  unknown: { label: "정보 입력 필요", cls: "bg-slate-50 text-slate-600 border-slate-200", icon: "?" },
-  unfit: { label: "자격 미달", cls: "bg-zinc-100 text-zinc-500 border-zinc-200", icon: "—" },
-};
-
-export default function ReminderCard({ card, match, onApply, onSnooze, onDismiss }: Props) {
+export default function ReminderCard({
+  card,
+  match,
+  status = null,
+  target = "재학생",
+  onApply,
+  onAddCalendar = () => {},
+}: Props) {
   const dd = dDay(card.deadline);
-  const fit = FIT_BADGE[match.status];
-  const lowConfidence = match.confidence < 0.8;
-  const dimmed = match.status === "unfit" || dd.n < 0;
+  if (dd.diff < 0) return <PastReminderCard card={card} diff={dd.diff} />;
 
-  // 좌측 띠: D-day ≤ 3 = amber, fit = emerald, 그 외 = none
-  const stripe =
-    dd.n >= 0 && dd.n <= 3
-      ? "border-l-4 border-l-amber-400"
-      : match.status === "fit"
-      ? "border-l-4 border-l-emerald-500"
-      : "border-l-4 border-l-transparent";
+  const ddayColor =
+    dd.diff <= 3 ? "text-due-soon-fg"
+    : dd.diff <= 7 ? "text-brand"
+    : "text-ink-800";
+
+  const isCompleted = status === "completed";
+  const isPlanning = status === "planning";
+  const elig = statusToState(match.status);
+  const amountValue =
+    card.benefit.type === "money" && card.benefit.amount
+      ? (card.benefit.amount / 10000).toLocaleString()
+      : null;
+  const amountUnit = card.benefit.type === "money" ? "만 원" : null;
+  const amountLabel = card.benefit.description ||
+    (card.benefit.type === "money" ? "지원 금액" :
+     card.benefit.type === "credit" ? "학점" : "");
 
   return (
     <article
       className={cn(
-        "rounded-2xl border border-zinc-200 bg-white p-5 transition",
-        "hover:-translate-y-0.5 hover:border-zinc-300",
-        stripe,
-        dimmed && "opacity-60",
-        "dark:bg-zinc-900 dark:border-zinc-800",
+        "flex flex-col gap-3.5 rounded-[16px] border border-line-1 bg-paper-0 p-[22px]",
+        "shadow-flat transition-shadow transition-colors duration-[180ms] ease-out",
+        "hover:shadow-lift-1 hover:border-line-strong",
       )}
-      aria-label={`${CATEGORY_LABEL[card.category]} · ${card.title} · ${fit.label}`}
     >
+      {/* 1. eyebrow + D-day | 캘린더 버튼 */}
       <header className="flex items-start justify-between gap-3">
-        {/* D-day 주인공 — 좌상단 큰 숫자 */}
-        <div className="flex flex-col">
-          <span className={cn(
-            "text-3xl font-bold leading-none tabular-nums",
-            dd.n < 0 ? "text-zinc-400" : dd.n <= 3 ? "text-amber-600" : "text-zinc-800 dark:text-zinc-100",
-          )}>
-            {dd.n < 0 ? "마감" : dd.n === 0 ? "오늘" : `D-${dd.n}`}
-          </span>
-          <span className="mt-1 text-xs text-zinc-500">{card.deadline}</span>
-        </div>
-
-        {/* 자격 라벨 + confidence */}
-        <div className="flex flex-col items-end gap-1">
-          <span className={cn("text-xs font-medium border rounded-full px-2 py-0.5", fit.cls)}>
-            <span className="mr-1">{fit.icon}</span>
-            {fit.label}
-            {match.status === "gap" && match.missing.length > 0 && ` · ${match.missing.length}`}
-          </span>
-          {lowConfidence && (
-            <span className="text-[10px] text-zinc-500" title="자동 판정 신뢰도가 낮아요">
-              ⓘ 확인 필요
+        <div>
+          <div className="text-eyebrow text-fg-3 mb-1.5">
+            {CATEGORY_LABEL[card.category]}
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className={cn("text-dday", ddayColor)} style={{ fontSize: 52 }}>
+              {dd.label}
             </span>
-          )}
+            {dd.diff <= 3 && (
+              <span className="text-eyebrow text-due-soon-fg ml-1">
+                마감 임박
+              </span>
+            )}
+          </div>
         </div>
+        <button
+          onClick={onAddCalendar}
+          aria-label="캘린더에 추가"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line-1 bg-paper-0 text-fg-2 hover:bg-ink-100 transition-colors"
+        >
+          <Calendar size={16} strokeWidth={1.75} aria-hidden />
+        </button>
       </header>
 
-      {/* 카테고리 + 제목 */}
-      <div className="mt-4">
-        <span className="text-[11px] font-medium text-zinc-500">
-          {CATEGORY_LABEL[card.category]}
+      {/* 2. 제목 — 2줄 clamp */}
+      <h3
+        className="font-semibold text-ink-800 m-0 -tracking-[0.01em]"
+        style={{
+          fontSize: 17,
+          lineHeight: 1.4,
+          minHeight: "calc(17px * 1.4 * 2)",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
+      >
+        {card.title}
+      </h3>
+
+      {/* 3. 타깃 + 자격 라벨 (한 줄) */}
+      <div className="flex items-center gap-2.5 text-[13px] text-fg-3 whitespace-nowrap overflow-hidden">
+        <span className="inline-flex items-center gap-1.5 min-w-0 overflow-hidden text-ellipsis">
+          {target}
         </span>
-        <h3 className="mt-1 text-base font-semibold text-zinc-900 leading-snug dark:text-zinc-100">
+        <span className="h-[3px] w-[3px] rounded-full bg-line-strong shrink-0" />
+        <span className="shrink-0">
+          <EligibilityBadge state={elig} compact />
+        </span>
+      </div>
+
+      {/* 4. 금액 — 점선 구분선 위, 인라인 */}
+      <div
+        className="flex items-baseline justify-between gap-2.5 pt-3.5 border-t border-dashed border-line-2"
+        style={{ minHeight: 32 }}
+      >
+        <span className="text-[13px] text-fg-3">{amountLabel}</span>
+        {amountValue && (
+          <span className="inline-flex items-baseline gap-0.5">
+            <span className="text-amount text-ink-800" style={{ fontSize: 24 }}>
+              {amountValue}
+            </span>
+            {amountUnit && (
+              <span className="text-sm font-semibold text-fg-2 ml-0.5">{amountUnit}</span>
+            )}
+          </span>
+        )}
+      </div>
+
+      {/* 5. Primary CTA */}
+      <button
+        onClick={onApply}
+        className={cn(
+          "mt-auto inline-flex items-center justify-center gap-1.5 rounded-lg border px-3.5 py-3 text-sm font-semibold transition-colors",
+          isCompleted
+            ? "bg-eligible-bg text-eligible-fg border-transparent"
+            : isPlanning
+            ? "bg-paper-50 text-ink-800 border-line-1"
+            : "bg-brand-deep text-white border-transparent hover:bg-ink-950",
+        )}
+      >
+        {isCompleted
+          ? <><CheckCircle2 size={15} strokeWidth={2} aria-hidden /> 신청 완료됨</>
+          : isPlanning
+          ? <><Check size={15} strokeWidth={2} aria-hidden /> 신청 예정 — 완료로 표시</>
+          : <><Plus size={15} strokeWidth={2} aria-hidden /> 신청 예정으로 표시</>}
+      </button>
+    </article>
+  );
+}
+
+// 지나간 기회 — 점선 테두리, 시계 아이콘, 작게.
+function PastReminderCard({ card, diff }: { card: ActionCard; diff: number }) {
+  return (
+    <article className="flex items-center gap-3.5 rounded-[16px] border border-dashed border-line-1 bg-transparent px-4.5 py-3.5 opacity-85">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-paper-50 text-fg-3">
+        <Clock3 size={18} strokeWidth={1.75} aria-hidden />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-eyebrow text-fg-4 mb-0.5">
+          {CATEGORY_LABEL[card.category]} · {-diff}일 지남
+        </div>
+        <h3 className="m-0 text-sm font-semibold text-fg-2 leading-snug truncate">
           {card.title}
         </h3>
       </div>
-
-      {/* 핵심 혜택 */}
-      <p className="mt-3 text-lg font-bold text-zinc-900 dark:text-zinc-100">
-        {card.benefit.type === "money" && card.benefit.amount
-          ? `${(card.benefit.amount / 10000).toLocaleString()}만원`
-          : card.benefit.type === "credit" && card.benefit.amount
-          ? `${card.benefit.amount}학점`
-          : card.benefit.description || "혜택 정보"}
-      </p>
-
-      {/* gap 상태일 때 부족 요건 미리보기 */}
-      {match.status === "gap" && match.missing.length > 0 && (
-        <details className="mt-3">
-          <summary className="text-xs text-amber-700 cursor-pointer">
-            부족한 요건 보기 ({match.missing.length}개)
-          </summary>
-          <ul className="mt-2 space-y-1 text-xs text-zinc-600">
-            {match.missing.slice(0, 2).map((m, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-amber-500">·</span>
-                <span>{m.gap}</span>
-              </li>
-            ))}
-            {match.missing.length > 2 && (
-              <li className="text-zinc-400">… 외 {match.missing.length - 2}개</li>
-            )}
-          </ul>
-        </details>
-      )}
-
-      {/* 액션 버튼 */}
-      <footer className="mt-4 flex items-center gap-2">
-        <button
-          onClick={onApply}
-          disabled={dimmed}
-          className={cn(
-            "flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition",
-            dimmed
-              ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
-              : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900",
-          )}
-        >
-          <ExternalLink size={14} aria-hidden /> 신청하러 가기
-        </button>
-        <button
-          onClick={onSnooze}
-          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-          aria-label="3일 뒤 알림"
-        >
-          <Bell size={14} aria-hidden /> 3일 뒤
-        </button>
-        <button
-          onClick={onDismiss}
-          className="inline-flex items-center justify-center rounded-lg border border-zinc-200 p-2 text-zinc-500 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
-          aria-label="숨기기"
-        >
-          <BellOff size={14} aria-hidden />
-        </button>
-      </footer>
+      <span className="text-xs text-fg-3 whitespace-nowrap">다음 학기 다시 알림</span>
     </article>
   );
 }
