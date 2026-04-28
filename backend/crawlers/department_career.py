@@ -1,22 +1,21 @@
-"""국민대 소프트웨어융합대학 SW 취업공지."""
+"""국민대 소프트웨어융합대학 SW 취업공지 — `./숫자` 형 상세 링크."""
 import re
-from .base import BaseCrawler
+from urllib.parse import urljoin
+from .base import BaseCrawler, board_config
+
+_CFG = board_config("department_career")
 
 
 class DepartmentCareerCrawler(BaseCrawler):
-    category = "career"
-    source_board = "소프트웨어융합대학 취업공지"
-    BASE_URL = "https://cs.kookmin.ac.kr"
-    LIST_URLS = [
-        "https://cs.kookmin.ac.kr/news/jobs/",
-    ]
-    # 상세 링크는 `./숫자` 형태 (예: ./2041)
-    LINK_SELECTOR = "a[href]"
+    category = _CFG["category"]
+    source_board = _CFG["source_board"]
+    BASE_URL = _CFG["base_url"]
+    LIST_URLS = _CFG["list_urls"]
+    LINK_SELECTOR = _CFG["link_selector"]
     LINK_HREF_PATTERN = None
-    DETAIL_RE = re.compile(r"^\./\d+$")
+    DETAIL_RE = re.compile(_CFG["link_href_regex"])
 
     def list_urls(self) -> list[str]:
-        from urllib.parse import urljoin
         urls: list[str] = []
         for list_url in self.LIST_URLS:
             try:

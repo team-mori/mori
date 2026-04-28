@@ -1,23 +1,22 @@
-"""국민대학교 학사공지 (kmuNews/notice/4) — 장학 관련 키워드만 필터."""
-from .base import BaseCrawler, RawNotice
+"""국민대학교 학사공지 — 제목 키워드 필터로 장학 관련만 통과."""
+from .base import BaseCrawler, RawNotice, board_config
 
-SCHOLARSHIP_KEYWORDS = ["장학", "학자금", "지원금", "등록금"]
+_CFG = board_config("academic")
 
 
 class AcademicCrawler(BaseCrawler):
-    category = "scholarship"
-    source_board = "학사공지"
-    BASE_URL = "https://www.kookmin.ac.kr"
-    LIST_URLS = [
-        "https://www.kookmin.ac.kr/user/kmuNews/notice/4/index.do",
-    ]
-    LINK_SELECTOR = "a[href*='view.do']"
-    LINK_HREF_PATTERN = "/user/kmuNews/notice/4/"
+    category = _CFG["category"]
+    source_board = _CFG["source_board"]
+    BASE_URL = _CFG["base_url"]
+    LIST_URLS = _CFG["list_urls"]
+    LINK_SELECTOR = _CFG["link_selector"]
+    LINK_HREF_PATTERN = _CFG.get("link_href_pattern")
+    KEYWORDS: list[str] = _CFG.get("title_keyword_filter", [])
 
     def parse(self, html: str, url: str) -> RawNotice | None:
         notice = super().parse(html, url)
         if not notice:
             return None
-        if not any(k in notice.title for k in SCHOLARSHIP_KEYWORDS):
+        if self.KEYWORDS and not any(k in notice.title for k in self.KEYWORDS):
             return None
         return notice

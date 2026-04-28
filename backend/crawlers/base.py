@@ -12,20 +12,43 @@ BaseCrawler — 한국 대학 게시판 공통 패턴 처리.
 """
 import re
 import time
+import urllib.robotparser as robotparser
 from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 from dataclasses import dataclass, field
 
+# User-Agent 에 모리 연락처 명시 — 운영자가 차단·연락 시 식별 가능하게.
+USER_AGENT = (
+    "MoriCrawler/0.1 (+https://github.com/team-mori/mori; contact: mori260409@gmail.com)"
+)
 HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0 Safari/537.36"
-    ),
+    "User-Agent": USER_AGENT,
     "Accept-Language": "ko-KR,ko;q=0.9,en;q=0.8",
 }
 
 REQUEST_DELAY_SEC = 1.0  # rate-limit (학교 서버 배려)
+
+# robots.txt 캐시 (도메인 단위)
+_ROBOTS_CACHE: dict[str, robotparser.RobotFileParser] = {}
+
+
+def is_allowed_by_robots(url: str) -> bool:
+    """robots.txt 위반 시 즉시 False — 호출자가 수집 중단해야 함."""
+    parsed = urlparse(url)
+    base = f"{parsed.scheme}://{parsed.netloc}"
+    rp = _ROBOTS_CACHE.get(base)
+    if rp is None:
+        rp = robotparser.RobotFileParser()
+        rp.set_url(f"{base}/robots.txt")
+        try:
+            rp.read()
+        except Exception:
+            # robots.txt 읽기 실패 시 보수적으로 허용 (대부분 학교 사이트는 robots 없음)
+            _ROBOTS_CACHE[base] = rp
+            return True
+        _ROBOTS_CACHE[base] = rp
+    return rp.can_fetch(USER_AGENT, url)
 
 # 첨부파일 후보 셀렉터
 ATTACHMENT_SELECTORS = [
@@ -70,6 +93,8 @@ class BaseCrawler:
     MAX_PER_RUN: int = 20  # 1회 실행당 최대 신규 수집
 
     def fetch(self, url: str) -> str:
+        if not is_allowed_by_robots(url):
+            raise PermissionError(f"robots.txt disallows fetching {url}")
         time.sleep(REQUEST_DELAY_SEC)
         r = requests.get(url, headers=HEADERS, timeout=15)
         r.raise_for_status()
@@ -156,7 +181,9 @@ class BaseCrawler:
 
     def run(self) -> list[RawNotice]:
         out: list[RawNotice] = []
+        attempted = 0
         for url in self.list_urls():
+            attempted += 1
             try:
                 html = self.fetch(url)
                 n = self.parse(html, url)
@@ -164,5 +191,37 @@ class BaseCrawler:
                     out.append(n)
             except Exception as e:
                 print(f"[{self.source_board}] detail fail {url}: {e}")
+        # 매칭 실패율 10% 초과 시 알림 (Slack 웹훅 연결은 후속 단계)
+        if attempted > 0:
+            fail_rate = 1.0 - (len(out) / attempted)
+            if fail_rate > 0.10:
+                print(
+                    f"[{self.source_board}] WARN selector match fail rate "
+                    f"{fail_rate:.1%} ({attempted - len(out)}/{attempted}) — "
+                    f"selectors.json review needed"
+                )
         print(f"[{self.source_board}] collected {len(out)}")
         return out
+
+
+# -----------------------------------------------------------------------------
+# selectors.json 로드 헬퍼 — 서브클래스가 클래스 변수 대신 이걸 호출해도 된다.
+# -----------------------------------------------------------------------------
+import json
+from pathlib import Path
+
+_SELECTORS_CACHE: dict | None = None
+
+
+def load_selectors() -> dict:
+    """backend/config/selectors.json 1회 로드. 게시판 구조 변경 시 이 파일만 수정."""
+    global _SELECTORS_CACHE
+    if _SELECTORS_CACHE is None:
+        cfg_path = Path(__file__).resolve().parent.parent / "config" / "selectors.json"
+        with open(cfg_path, encoding="utf-8") as f:
+            _SELECTORS_CACHE = json.load(f)
+    return _SELECTORS_CACHE
+
+
+def board_config(board_key: str) -> dict:
+    return load_selectors()["boards"][board_key]

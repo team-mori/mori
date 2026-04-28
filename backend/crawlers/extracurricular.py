@@ -1,13 +1,13 @@
-"""국민대학교 공모·행사 (kmuNews/notice/9) — 비교과·대외활동 카테고리."""
-from .base import BaseCrawler
+"""국민대학교 공모·행사 — 셀렉터는 backend/config/selectors.json."""
+from .base import BaseCrawler, board_config
+
+_CFG = board_config("extracurricular")
 
 
 class ExtracurricularCrawler(BaseCrawler):
-    category = "extracurricular"
-    source_board = "공모·행사"
-    BASE_URL = "https://www.kookmin.ac.kr"
-    LIST_URLS = [
-        "https://www.kookmin.ac.kr/user/kmuNews/notice/9/index.do",
-    ]
-    LINK_SELECTOR = "a[href*='view.do']"
-    LINK_HREF_PATTERN = "/user/kmuNews/notice/9/"
+    category = _CFG["category"]
+    source_board = _CFG["source_board"]
+    BASE_URL = _CFG["base_url"]
+    LIST_URLS = _CFG["list_urls"]
+    LINK_SELECTOR = _CFG["link_selector"]
+    LINK_HREF_PATTERN = _CFG.get("link_href_pattern")

@@ -1,0 +1,47 @@
+{
+  "$schema_doc": "각 항목은 BaseCrawler 서브클래스가 읽어 LIST_URLS / LINK_SELECTOR / LINK_HREF_PATTERN / TITLE_SELECTORS / BODY_SELECTORS 를 오버라이드한다. 게시판 구조 변경 시 코드 수정 없이 이 파일만 갱신하면 된다.",
+  "$generated_at": "2026-04-28",
+  "boards": {
+    "scholarship": {
+      "category": "scholarship",
+      "source_board": "장학공지",
+      "base_url": "https://www.kookmin.ac.kr",
+      "list_urls": ["https://www.kookmin.ac.kr/user/kmuNews/notice/7/index.do"],
+      "link_selector": "a[href*='view.do']",
+      "link_href_pattern": "/user/kmuNews/notice/7/"
+    },
+    "academic": {
+      "category": "scholarship",
+      "source_board": "학사공지",
+      "base_url": "https://www.kookmin.ac.kr",
+      "list_urls": ["https://www.kookmin.ac.kr/user/kmuNews/notice/4/index.do"],
+      "link_selector": "a[href*='view.do']",
+      "link_href_pattern": "/user/kmuNews/notice/4/",
+      "title_keyword_filter": ["장학", "학자금", "지원금", "등록금"]
+    },
+    "extracurricular": {
+      "category": "extracurricular",
+      "source_board": "공모·행사",
+      "base_url": "https://www.kookmin.ac.kr",
+      "list_urls": ["https://www.kookmin.ac.kr/user/kmuNews/notice/9/index.do"],
+      "link_selector": "a[href*='view.do']",
+      "link_href_pattern": "/user/kmuNews/notice/9/"
+    },
+    "career": {
+      "category": "career",
+      "source_board": "교외채용",
+      "base_url": "https://www.kookmin.ac.kr",
+      "list_urls": ["https://www.kookmin.ac.kr/user/kmuNews/notice/11/index.do"],
+      "link_selector": "a[href*='view.do']",
+      "link_href_pattern": "/user/kmuNews/notice/11/"
+    },
+    "department_career": {
+      "category": "career",
+      "source_board": "소프트웨어융합대학 취업공지",
+      "base_url": "https://cs.kookmin.ac.kr",
+      "list_urls": ["https://cs.kookmin.ac.kr/news/jobs/"],
+      "link_selector": "a[href]",
+      "link_href_regex": "^\\./\\d+$"
+    }
+  }
+}
