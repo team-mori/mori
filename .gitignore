@@ -19,3 +19,22 @@ venv/
 # misc
 .DS_Store
 *.log
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+
+# Gradle / Java build
+.gradle/
+build/
+bin/
+*.class
+
+# Agent CLI
+.antigravitycli/
