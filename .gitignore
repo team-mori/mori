@@ -38,3 +38,6 @@ bin/
 
 # Agent CLI
 .antigravitycli/
+
+# Crawler Log
+crawler/log/
