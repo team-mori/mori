@@ -11,11 +11,17 @@ public class NoticeDetail {
     private final String identifier;
     private final String bodyText;
     private final List<String> bodyImages;
+    private final boolean hasImageDownloadError;
 
     public NoticeDetail(String identifier, String bodyText, List<String> bodyImages) {
+        this(identifier, bodyText, bodyImages, false);
+    }
+
+    public NoticeDetail(String identifier, String bodyText, List<String> bodyImages, boolean hasImageDownloadError) {
         this.identifier = identifier;
         this.bodyText = bodyText;
         this.bodyImages = bodyImages;
+        this.hasImageDownloadError = hasImageDownloadError;
     }
 
     public String getIdentifier() {
@@ -28,6 +34,10 @@ public class NoticeDetail {
 
     public List<String> getBodyImages() {
         return bodyImages;
+    }
+
+    public boolean hasImageDownloadError() {
+        return hasImageDownloadError;
     }
 
     @Override
