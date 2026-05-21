@@ -2,22 +2,23 @@ package com.mori.crawler.dto;
 
 import com.mori.crawler.category.NoticeCategory;
 import java.time.LocalDate;
+import java.util.List;
 
 public class NoticeDto {
 
     private final String title;
     private final String link;
     private final LocalDate postDate;
-    private final LocalDate deadline;
+    private List<DeadlineItem> deadlines;
     private final NoticeCategory category;
     private final String identifier;
 
     public NoticeDto(String title, String link, LocalDate postDate,
-                     LocalDate deadline, NoticeCategory category, String identifier) {
+                     List<DeadlineItem> deadlines, NoticeCategory category, String identifier) {
         this.title = title;
         this.link = link;
         this.postDate = postDate;
-        this.deadline = deadline;
+        this.deadlines = deadlines;
         this.category = category;
         this.identifier = identifier;
     }
@@ -34,8 +35,12 @@ public class NoticeDto {
         return postDate;
     }
 
-    public LocalDate getDeadline() {
-        return deadline;
+    public List<DeadlineItem> getDeadlines() {
+        return deadlines;
+    }
+
+    public void setDeadlines(List<DeadlineItem> deadlines) {
+        this.deadlines = deadlines;
     }
 
     public NoticeCategory getCategory() {
@@ -52,7 +57,7 @@ public class NoticeDto {
                 "title='" + title + '\'' +
                 ", link='" + link + '\'' +
                 ", postDate=" + postDate +
-                ", deadline=" + deadline +
+                ", deadlines=" + deadlines +
                 ", category=" + category +
                 ", identifier='" + identifier + '\'' +
                 '}';
