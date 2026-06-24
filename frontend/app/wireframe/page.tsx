@@ -14,10 +14,8 @@ import {
   FileCheck2,
   FileText,
   Filter,
-  GraduationCap,
   Home,
   Info,
-  Layers3,
   ListChecks,
   RefreshCw,
   Search,
@@ -204,9 +202,12 @@ export default function WireframePage() {
       <section className="mx-auto max-w-[1440px] px-5 py-8 md:px-8">
         <header className="flex flex-col gap-5 border-b border-line-2 pb-7 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
-            <p className="text-1 font-[var(--font-weight-bold)] uppercase tracking-normal text-brand-text">
-              MORI student mobile MVP
-            </p>
+            <div className="flex items-center gap-3">
+              <MoriMark size={28} />
+              <p className="text-1 font-[var(--font-weight-bold)] uppercase tracking-normal text-brand-text">
+                MORI student mobile MVP
+              </p>
+            </div>
             <h1 className="mt-2 text-7 font-[var(--font-weight-bold)] tracking-normal md:text-8">
               PRD 기반 학생 모바일 와이어프레임
             </h1>
@@ -268,10 +269,36 @@ function PhoneFrame({ title, note, children }: { title: string; note: string; ch
         <h2 className="text-3 font-[var(--font-weight-bold)] tracking-normal">{title}</h2>
         <p className="mt-1 text-1 text-fg-3">{note}</p>
       </div>
-      <div className="mx-auto aspect-[390/844] min-w-[320px] max-w-[390px] overflow-hidden rounded-[32px] border border-line-strong bg-page shadow-lift-2">
+      <div className="mx-auto aspect-[390/844] min-w-[320px] max-w-[390px] overflow-hidden rounded-[20px] border border-line-1 bg-page shadow-lift-2">
         {children}
       </div>
     </article>
+  );
+}
+
+function MoriMark({ size = 24 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="12" cy="12" r="11" fill="var(--brand)" />
+      <path
+        d="M7 14.5 L7 8.5 L10 12 L12 8.5 L14 12 L17 8.5 L17 14.5"
+        stroke="var(--bg-page)"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="17" cy="6.5" r="1.6" fill="var(--state-eligible-fg)" />
+    </svg>
+  );
+}
+
+function MoriWordmark() {
+  return (
+    <div className="flex items-center gap-2">
+      <MoriMark size={24} />
+      <span className="text-4 font-[var(--font-weight-bold)] tracking-normal text-brand">모리</span>
+      <span className="text-1 font-[var(--font-weight-bold)] uppercase tracking-normal text-fg-4">MORI</span>
+    </div>
   );
 }
 
@@ -292,9 +319,8 @@ function ProfileScreen() {
     <div className="flex h-full flex-col bg-page">
       <StatusBar />
       <div className="flex-1 px-[var(--screen-padding-x)] pb-5 pt-6">
-        <div className="grid h-12 w-12 place-items-center rounded-5 bg-brand-tint text-brand-text">
-          <GraduationCap size={22} strokeWidth={1.75} aria-hidden />
-        </div>
+        <MoriWordmark />
+        <p className="mt-2 text-1 text-fg-4">모두의 리마인더</p>
         <h3 className="mt-6 text-6 font-[var(--font-weight-bold)] tracking-normal">
           내 조건을 알려주세요
         </h3>
@@ -319,7 +345,7 @@ function ProfileScreen() {
                 key={item}
                 className={[
                   "inline-flex h-[var(--chip-height)] items-center rounded-pill border px-[var(--chip-padding-x)] text-2 font-[var(--font-weight-medium)]",
-                  index < 3 ? toneClass.saved : "border-line-1 bg-page text-fg-2",
+                  index < 3 ? "border-brand bg-brand text-fg-on-brand" : "border-line-1 bg-page text-fg-2",
                 ].join(" ")}
               >
                 {index < 3 && <Check size={14} strokeWidth={2} className="mr-1.5" aria-hidden />}
@@ -344,13 +370,25 @@ function HomeScreen() {
       <StatusBar />
       <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-3 pt-3">
         <div className="flex items-center justify-between">
+          <MoriWordmark />
+          <div className="flex gap-2">
+            <button className="grid h-10 w-10 place-items-center rounded-pill border border-line-1 bg-surface text-fg-2">
+              <Search size={17} strokeWidth={1.75} aria-label="검색" />
+            </button>
+            <button className="grid h-10 w-10 place-items-center rounded-pill border border-line-1 bg-surface text-fg-2">
+              <Bell size={17} strokeWidth={1.75} aria-label="알림" />
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-5 flex items-end justify-between gap-3">
           <div>
-            <p className="text-1 text-fg-3">오늘의 모리</p>
+            <p className="text-1 text-fg-3">마감 우선 피드</p>
             <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">챙길 기회 8개</h3>
           </div>
-          <button className="grid h-10 w-10 place-items-center rounded-pill border border-line-1 bg-surface text-fg-2">
-            <Bell size={17} strokeWidth={1.75} aria-label="알림" />
-          </button>
+          <span className="rounded-pill border border-line-1 bg-surface px-3 py-1 text-1 font-[var(--font-weight-bold)] text-fg-2">
+            공지 53건 반영
+          </span>
         </div>
 
         <div className="mt-4 flex h-10 items-center gap-2 rounded-4 border border-line-1 bg-surface px-3 text-2 text-fg-3">
@@ -381,14 +419,13 @@ function HomeScreen() {
           ))}
         </div>
 
-        <section className="mt-4 rounded-5 border border-brand-line bg-brand-tint p-4">
+        <section className="mt-4 border-y border-brand-line bg-brand-tint py-3">
           <div className="flex items-start gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-4 bg-surface text-brand-text">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-4 bg-surface text-brand-text">
               <ShieldCheck size={18} strokeWidth={1.75} aria-hidden />
             </span>
             <div className="min-w-0">
               <p className="text-1 font-[var(--font-weight-bold)] text-brand-text">내 조건으로 먼저 골랐어요</p>
-              <p className="mt-1 text-4 font-[var(--font-weight-bold)] tracking-normal">마감 전에 챙길 기회</p>
               <p className="mt-1 text-2 text-fg-2">자격 충족 5개, 확인 필요 1개가 있어요.</p>
             </div>
           </div>
@@ -492,30 +529,32 @@ function DetailScreen() {
           </span>
         </div>
 
-        <section className="mt-5 rounded-5 border border-line-1 bg-surface p-3 shadow-flat">
-          <div className="grid grid-cols-[minmax(0,1fr)_56px] gap-2.5">
-            <div className="min-w-0">
-              <span className="inline-flex whitespace-nowrap rounded-pill border border-state-eligible-line bg-state-eligible-bg px-2.5 py-1 text-1 font-[var(--font-weight-bold)] text-state-eligible-fg">
-                자격 충족
-              </span>
-              <h3 className="mt-3 break-keep text-3 font-[var(--font-weight-bold)] leading-[20px] tracking-normal">
-                국가장학금 2차 신청
-              </h3>
-              <p className="mt-2 text-1 leading-[16px] text-fg-2">재학생 / 소득 8분위 이하 / 12학점 이상</p>
-            </div>
-            <div className="text-right">
-              <p className="text-1 text-fg-3">마감</p>
-              <p className="text-dday text-[28px] leading-none text-state-due-fg">D-2</p>
-              <p className="text-1 text-fg-3">6월 25일</p>
-              <p className="text-1 text-fg-3">18:00</p>
-            </div>
-          </div>
-          <div className="mt-4 rounded-4 bg-page p-3">
+        <section className="mt-5 border-b border-line-2 pb-5">
+          <p className="text-1 font-[var(--font-weight-bold)] uppercase tracking-normal text-fg-3">장학 · 학교 장학팀</p>
+          <div className="mt-2 flex items-baseline gap-3">
+            <p className="text-dday text-[56px] leading-none text-state-due-fg">D-2</p>
             <div>
-              <p className="text-1 text-fg-3">받을 수 있는 혜택</p>
-              <p className="mt-1 text-4 font-[var(--font-weight-bold)] tracking-normal">월 30만 원</p>
+              <p className="text-1 font-[var(--font-weight-bold)] text-state-due-fg">마감 임박</p>
+              <p className="mt-1 text-1 text-fg-3">6월 25일 18:00</p>
             </div>
           </div>
+          <h3 className="mt-3 break-keep text-5 font-[var(--font-weight-bold)] leading-[28px] tracking-normal">
+            국가장학금 2차 신청
+          </h3>
+          <div className="mt-3 flex items-baseline gap-2">
+            <p className="text-5 font-[var(--font-weight-bold)] tracking-normal text-fg-1">월 30만 원</p>
+            <p className="text-1 text-fg-3">생활비 지원 가능</p>
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-4 bg-state-eligible-bg p-4 text-state-eligible-fg">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={18} strokeWidth={1.75} aria-hidden />
+            <h4 className="text-3 font-[var(--font-weight-bold)]">자격 충족</h4>
+          </div>
+          <p className="mt-2 text-1 leading-[16px] text-fg-2">
+            재학생, 소득 구간, 이수 학점이 입력하신 프로필과 일치해요.
+          </p>
         </section>
 
         <section className="border-b border-line-2 py-4">
@@ -563,6 +602,27 @@ function DetailScreen() {
                   <span className="block text-2 font-[var(--font-weight-bold)]">{title}</span>
                   <span className="block text-1 text-fg-3">{desc}</span>
                 </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-t border-line-2 py-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h4 className="text-2 font-[var(--font-weight-bold)]">이 공지와 연결된 추천</h4>
+            <span className="text-1 text-brand-text">4개</span>
+          </div>
+          <div className="space-y-2">
+            {[
+              ["공모전", "대학생 ESG 아이디어 공모전"],
+              ["청년정책", "청년 자격증 응시료 지원"],
+            ].map(([label, title]) => (
+              <div key={title} className="grid min-h-[40px] grid-cols-[68px_minmax(0,1fr)_16px] items-center gap-2 rounded-4 border border-line-1 bg-surface px-3">
+                <span className="rounded-pill bg-brand-tint px-2 py-1 text-center text-1 font-[var(--font-weight-bold)] text-brand-text">
+                  {label}
+                </span>
+                <span className="truncate text-1 font-[var(--font-weight-medium)] text-fg-1">{title}</span>
+                <ChevronRight size={14} strokeWidth={1.75} className="text-fg-3" aria-hidden />
               </div>
             ))}
           </div>
