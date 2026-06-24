@@ -10,19 +10,30 @@ import {
   CheckCircle2,
   ChevronRight,
   Clock3,
+  Edit3,
   ExternalLink,
+  EyeOff,
   FileCheck2,
   FileText,
+  FileUp,
   Filter,
+  History,
   Home,
   Info,
+  Link2,
   ListChecks,
+  MapPin,
+  MessageSquare,
   RefreshCw,
   Search,
   Settings2,
+  Share2,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
+  School,
   Trophy,
+  Trash2,
   UserRound,
   WalletCards,
 } from "lucide-react";
@@ -178,8 +189,48 @@ const postApplySteps = [
 const tokens = [
   ["Primitive", "Radix slate / ink primary / soft indigo / green / amber"],
   ["State", "eligible / insufficient / unknown / due / saved / planned"],
-  ["MVP1", "notice ingestion / action card / calendar / recommendations"],
+  ["Coverage", "P0 + P1 student mobile flows"],
   ["Mobile", "320px min, stable phone ratio, 36px chips"],
+] as const;
+
+const profileSettings = [
+  ["학교", "한국대학교", "school"],
+  ["학과", "컴퓨터공학부", "school"],
+  ["학년", "3학년 재학", "user"],
+  ["소득 구간", "8분위 이하", "wallet"],
+  ["거주지", "서울시 관악구", "map"],
+  ["관심 분야", "장학, 취업, 해외연수", "sparkles"],
+] as const;
+
+const filterGroups = [
+  ["카테고리", ["장학", "비교과", "취업", "공모전", "청년정책"]],
+  ["상태", ["자격 충족", "확인 필요", "저장됨", "숨김 제외"]],
+  ["마감", ["오늘", "3일 이내", "7일 이내", "이번 달"]],
+] as const;
+
+const sourceEvents = [
+  ["마감 변경", "6월 26일 18:00 → 6월 25일 18:00", "due"],
+  ["첨부 추가", "가구원 동의서 PDF 1개 추가", "saved"],
+  ["본문 유지", "제목과 대상 조건 변경 없음", "eligible"],
+] as const;
+
+const feedbackActions = [
+  ["저장", "내 기회에 보관하고 알림 후보로 유지", "saved"],
+  ["숨김", "피드에서 제거하되 원문 기록은 유지", "ineligible"],
+  ["관심없음", "비슷한 추천을 줄이도록 반영", "insufficient"],
+] as const;
+
+const applicationStatusRows = [
+  ["검토중", "원문과 조건을 확인하는 단계", "done"],
+  ["준비중", "재학증명서 업로드 필요", "active"],
+  ["신청완료", "학생 포털 제출 후 체크", "todo"],
+  ["결과확인", "선발 공지 자동 확인", "todo"],
+] as const;
+
+const shareRows = [
+  ["요약 링크", "제목, 마감, 자격, 원문 링크 포함"],
+  ["친구에게 공유", "추천 이유와 체크리스트 제외"],
+  ["팀 채팅 공유", "공모전/비교과 일정 중심"],
 ] as const;
 
 type Tone = "eligible" | "insufficient" | "ineligible" | "unknown" | "due" | "saved" | "planned" | "applied" | "calendar";
@@ -212,7 +263,8 @@ export default function WireframePage() {
               PRD 기반 학생 모바일 와이어프레임
             </h1>
             <p className="mt-3 text-3 text-fg-2">
-              학교 공지 수집, 액션카드, 캘린더 저장, 공모전/청년정책 추천, 정보 부족 상태까지 MVP1 흐름을 화면으로 분리했습니다.
+              학교 공지 수집, 액션카드, 캘린더 저장, 공모전/청년정책 추천, 정보 부족 보완, 검색/필터, 원문 변경 감지,
+              신청 상태 관리까지 학생 MVP의 P0/P1 흐름을 화면으로 분리했습니다.
             </p>
           </div>
           <div className="grid min-w-[280px] gap-2 rounded-5 border border-line-1 bg-surface p-4 shadow-flat">
@@ -255,6 +307,24 @@ export default function WireframePage() {
           </PhoneFrame>
           <PhoneFrame title="10. 신청 후 피드백" note="Any.do + Asana calendar">
             <PostApplyScreen />
+          </PhoneFrame>
+          <PhoneFrame title="11. 프로필 관리" note="eligibility inputs">
+            <ProfileSettingsScreen />
+          </PhoneFrame>
+          <PhoneFrame title="12. 검색/필터" note="saved search + sort">
+            <SearchFilterScreen />
+          </PhoneFrame>
+          <PhoneFrame title="13. 원문/변경 확인" note="source + change detection">
+            <SourceChangeScreen />
+          </PhoneFrame>
+          <PhoneFrame title="14. 추천 피드백" note="save / hide / not interested">
+            <FeedbackScreen />
+          </PhoneFrame>
+          <PhoneFrame title="15. 신청 상태" note="status + documents">
+            <ApplicationStatusScreen />
+          </PhoneFrame>
+          <PhoneFrame title="16. 공유 요약" note="shareable notice summary">
+            <ShareSummaryScreen />
           </PhoneFrame>
         </section>
       </section>
@@ -1021,6 +1091,443 @@ function PostApplyScreen() {
         </div>
       </div>
       <BottomNav active="일정" />
+    </div>
+  );
+}
+
+function ProfileSettingsScreen() {
+  const iconMap: Record<string, LucideIcon> = {
+    school: School,
+    user: UserRound,
+    wallet: WalletCards,
+    map: MapPin,
+    sparkles: Sparkles,
+  };
+
+  return (
+    <div className="flex h-full flex-col bg-page">
+      <StatusBar />
+      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-1 text-fg-3">조건 관리</p>
+            <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">내 추천 기준</h3>
+          </div>
+          <button className="grid h-10 w-10 place-items-center rounded-pill border border-line-1 bg-surface text-fg-2">
+            <Edit3 size={17} strokeWidth={1.75} aria-label="수정" />
+          </button>
+        </div>
+
+        <section className="mt-4 border-y border-brand-line bg-brand-tint py-3">
+          <div className="flex items-start gap-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-4 bg-surface text-brand-text">
+              <ShieldCheck size={18} strokeWidth={1.75} aria-hidden />
+            </span>
+            <div className="min-w-0">
+              <p className="text-2 font-[var(--font-weight-bold)] text-brand-text">자격 판정에 쓰는 정보</p>
+              <p className="mt-1 text-1 leading-[16px] text-fg-2">비어 있는 항목은 확인 필요 상태로 남겨요.</p>
+            </div>
+          </div>
+        </section>
+
+        <div className="mt-4 divide-y divide-line-2 rounded-5 border border-line-1 bg-surface">
+          {profileSettings.map(([label, value, iconKey]) => {
+            const Icon = iconMap[iconKey] ?? Info;
+            return (
+              <button key={label} className="grid min-h-[58px] w-full grid-cols-[32px_minmax(0,1fr)_18px] items-center gap-3 px-4 text-left">
+                <span className="grid h-8 w-8 place-items-center rounded-3 bg-page text-brand-text">
+                  <Icon size={16} strokeWidth={1.75} aria-hidden />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-1 text-fg-3">{label}</span>
+                  <span className="block truncate text-2 font-[var(--font-weight-bold)] text-fg-1">{value}</span>
+                </span>
+                <ChevronRight size={15} strokeWidth={1.75} className="text-fg-3" aria-hidden />
+              </button>
+            );
+          })}
+        </div>
+
+        <section className="mt-4 rounded-5 border border-state-unknown-line bg-state-unknown-bg p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-1 font-[var(--font-weight-bold)] text-state-unknown-fg">보완하면 좋아요</p>
+              <h4 className="mt-1 text-3 font-[var(--font-weight-bold)] text-fg-1">어학 점수, 여권 만료일</h4>
+              <p className="mt-1 text-1 leading-[16px] text-fg-2">해외연수 공지 2개가 확인 필요로 남아 있어요.</p>
+            </div>
+            <span className="rounded-pill border border-state-unknown-line bg-surface px-2 py-1 text-1 font-[var(--font-weight-bold)] text-state-unknown-fg">
+              2개
+            </span>
+          </div>
+        </section>
+      </div>
+      <div className="border-t border-line-2 bg-surface px-[var(--screen-padding-x)] py-4">
+        <button className="h-11 w-full rounded-4 bg-brand text-2 font-[var(--font-weight-bold)] text-fg-on-brand">
+          조건 저장
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SearchFilterScreen() {
+  return (
+    <div className="flex h-full flex-col bg-page">
+      <StatusBar />
+      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-1 text-fg-3">탐색</p>
+            <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">검색과 필터</h3>
+          </div>
+          <button className="grid h-10 w-10 place-items-center rounded-pill border border-line-1 bg-surface text-fg-2">
+            <SlidersHorizontal size={17} strokeWidth={1.75} aria-label="필터" />
+          </button>
+        </div>
+
+        <div className="mt-4 flex h-11 items-center gap-2 rounded-4 border border-line-1 bg-surface px-3 text-2 text-fg-3">
+          <Search size={16} strokeWidth={1.75} aria-hidden />
+          국가장학금, 인턴, 공모전 검색
+        </div>
+
+        <section className="mt-4 rounded-5 border border-line-1 bg-surface p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h4 className="text-3 font-[var(--font-weight-bold)]">정렬</h4>
+            <span className="text-1 text-brand-text">마감순</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {["마감순", "충족순", "최신순"].map((sort, index) => (
+              <button
+                key={sort}
+                className={[
+                  "h-9 rounded-3 border text-1 font-[var(--font-weight-bold)]",
+                  index === 0 ? "border-brand bg-brand text-fg-on-brand" : "border-line-1 bg-page text-fg-2",
+                ].join(" ")}
+              >
+                {sort}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-4 space-y-4">
+          {filterGroups.map(([label, chips]) => (
+            <div key={label}>
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-2 font-[var(--font-weight-bold)]">{label}</h4>
+                <span className="text-1 text-fg-3">다중 선택</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {chips.map((chip, index) => (
+                  <span
+                    key={chip}
+                    className={[
+                      "inline-flex h-8 items-center rounded-pill border px-3 text-1 font-[var(--font-weight-bold)]",
+                      index < 2 ? "border-brand-line bg-brand-tint text-brand-text" : "border-line-1 bg-surface text-fg-2",
+                    ].join(" ")}
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <section className="mt-4 rounded-5 border border-state-calendar-line bg-state-calendar-bg p-4">
+          <div className="flex items-start gap-3">
+            <Bell size={18} strokeWidth={1.75} className="mt-0.5 shrink-0 text-state-calendar-fg" aria-hidden />
+            <div className="min-w-0">
+              <p className="text-2 font-[var(--font-weight-bold)] text-fg-1">이 검색 저장</p>
+              <p className="mt-1 text-1 leading-[16px] text-fg-2">장학 · 자격 충족 · 7일 이내 조건으로 새 공지가 뜨면 알려요.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+      <BottomNav active="탐색" />
+    </div>
+  );
+}
+
+function SourceChangeScreen() {
+  return (
+    <div className="flex h-full flex-col bg-surface">
+      <StatusBar />
+      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-1 text-fg-3">원문과 변경 이력</p>
+            <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">신뢰 확인</h3>
+          </div>
+          <span className="grid h-10 w-10 place-items-center rounded-4 bg-brand-tint text-brand-text">
+            <History size={18} strokeWidth={1.75} aria-hidden />
+          </span>
+        </div>
+
+        <section className="mt-4 border-b border-line-2 pb-4">
+          <p className="text-1 font-[var(--font-weight-bold)] uppercase tracking-normal text-fg-3">학교 장학팀 원문</p>
+          <h4 className="mt-2 break-keep text-4 font-[var(--font-weight-bold)] leading-[26px]">
+            국가장학금 2차 신청 및 가구원 정보 제공 동의 안내
+          </h4>
+          <div className="mt-3 grid grid-cols-[76px_minmax(0,1fr)] gap-y-2 text-1">
+            <span className="text-fg-3">수집 시각</span>
+            <span className="font-[var(--font-weight-bold)] text-fg-1">오늘 09:12</span>
+            <span className="text-fg-3">추출 신뢰도</span>
+            <span className="font-[var(--font-weight-bold)] text-state-eligible-fg">높음 · 92%</span>
+            <span className="text-fg-3">첨부</span>
+            <span className="font-[var(--font-weight-bold)] text-fg-1">PDF 2개, HWP 1개</span>
+          </div>
+        </section>
+
+        <section className="border-b border-line-2 py-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h4 className="text-3 font-[var(--font-weight-bold)]">변경 감지</h4>
+            <span className="rounded-pill border border-state-due-line bg-state-due-bg px-2 py-1 text-1 font-[var(--font-weight-bold)] text-state-due-fg">
+              1건 중요
+            </span>
+          </div>
+          <div className="space-y-2">
+            {sourceEvents.map(([label, value, tone]) => (
+              <div key={label} className="grid min-h-[52px] grid-cols-[76px_minmax(0,1fr)] items-center gap-3 rounded-4 bg-page px-3">
+                <span className={["rounded-pill border px-2 py-1 text-center text-1 font-[var(--font-weight-bold)]", toneClass[tone as Tone]].join(" ")}>
+                  {label}
+                </span>
+                <span className="line-clamp-2 text-1 leading-[16px] text-fg-2">{value}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="py-4">
+          <div className="flex items-center gap-2">
+            <Link2 size={16} strokeWidth={1.75} className="text-brand-text" aria-hidden />
+            <h4 className="text-3 font-[var(--font-weight-bold)]">원문 접근</h4>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button className="h-10 rounded-4 border border-line-1 bg-page text-1 font-[var(--font-weight-bold)] text-fg-2">공지 열기</button>
+            <button className="h-10 rounded-4 border border-line-1 bg-page text-1 font-[var(--font-weight-bold)] text-fg-2">첨부 보기</button>
+          </div>
+        </section>
+      </div>
+      <div className="border-t border-line-2 bg-surface px-[var(--screen-padding-x)] py-4">
+        <button className="h-11 w-full rounded-4 bg-brand text-2 font-[var(--font-weight-bold)] text-fg-on-brand">
+          변경된 마감으로 저장
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FeedbackScreen() {
+  const iconMap: Record<string, LucideIcon> = {
+    저장: Bookmark,
+    숨김: EyeOff,
+    관심없음: Trash2,
+  };
+
+  return (
+    <div className="flex h-full flex-col bg-page">
+      <StatusBar />
+      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+        <div>
+          <p className="text-1 text-fg-3">추천 품질</p>
+          <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">피드백 반영</h3>
+          <p className="mt-1 text-1 text-fg-3">저장, 숨김, 관심없음은 추천과 알림 후보에 반영돼요.</p>
+        </div>
+
+        <section className="mt-4 rounded-5 border border-line-1 bg-surface p-4">
+          <OpportunityCard item={opportunities[4]} compact />
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {feedbackActions.map(([label, desc, tone]) => {
+              const Icon = iconMap[label] ?? Bookmark;
+              return (
+                <button key={label} className={["min-h-[84px] rounded-4 border p-2 text-left", toneClass[tone as Tone]].join(" ")}>
+                  <Icon size={16} strokeWidth={1.75} aria-hidden />
+                  <span className="mt-2 block text-1 font-[var(--font-weight-bold)]">{label}</span>
+                  <span className="mt-1 block text-[10px] leading-[13px] text-fg-2">{desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-5 border border-brand-line bg-brand-tint p-4">
+          <div className="flex items-start gap-3">
+            <Sparkles size={18} strokeWidth={1.75} className="mt-0.5 shrink-0 text-brand-text" aria-hidden />
+            <div className="min-w-0">
+              <p className="text-2 font-[var(--font-weight-bold)] text-brand-text">추천 이유</p>
+              <p className="mt-1 text-1 leading-[16px] text-fg-2">취업 준비 관심사, 자격증 키워드, 최근 저장한 장학 공지와 연결돼요.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h4 className="text-3 font-[var(--font-weight-bold)]">반영 후 피드</h4>
+            <span className="text-1 text-brand-text">즉시 적용</span>
+          </div>
+          <div className="space-y-2">
+            {[
+              ["공모전 추천", "ESG, 포트폴리오 키워드는 유지"],
+              ["청년정책 추천", "월세/생활비 정책은 낮은 우선순위"],
+              ["마감 알림", "숨김 항목은 알림 후보에서 제외"],
+            ].map(([label, value]) => (
+              <div key={label} className="grid min-h-[44px] grid-cols-[84px_minmax(0,1fr)] items-center gap-3 border-b border-line-2 text-1 last:border-b-0">
+                <span className="font-[var(--font-weight-bold)] text-fg-1">{label}</span>
+                <span className="text-fg-3">{value}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+      <BottomNav active="홈" />
+    </div>
+  );
+}
+
+function ApplicationStatusScreen() {
+  return (
+    <div className="flex h-full flex-col bg-page">
+      <StatusBar />
+      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-1 text-fg-3">신청 관리</p>
+            <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">국가장학금 준비중</h3>
+          </div>
+          <span className="rounded-pill border border-state-planned-line bg-state-planned-bg px-3 py-1 text-1 font-[var(--font-weight-bold)] text-state-planned-fg">
+            D-2
+          </span>
+        </div>
+
+        <section className="mt-4 rounded-5 border border-line-1 bg-surface p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h4 className="text-3 font-[var(--font-weight-bold)]">상태</h4>
+            <span className="text-1 text-brand-text">2단계</span>
+          </div>
+          <div className="space-y-3">
+            {applicationStatusRows.map(([label, value, state], index) => (
+              <div key={label} className="grid grid-cols-[24px_minmax(0,1fr)] gap-3">
+                <span
+                  className={[
+                    "mt-0.5 grid h-6 w-6 place-items-center rounded-pill border text-[10px] font-[var(--font-weight-bold)]",
+                    state === "done"
+                      ? "border-state-eligible-line bg-state-eligible-bg text-state-eligible-fg"
+                      : state === "active"
+                        ? "border-brand bg-brand text-fg-on-brand"
+                        : "border-line-1 bg-page text-fg-3",
+                  ].join(" ")}
+                >
+                  {index + 1}
+                </span>
+                <span className="min-w-0 border-b border-line-2 pb-3 last:border-b-0">
+                  <span className="block text-2 font-[var(--font-weight-bold)] text-fg-1">{label}</span>
+                  <span className="block text-1 text-fg-3">{value}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-5 border border-line-1 bg-surface p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h4 className="text-3 font-[var(--font-weight-bold)]">서류</h4>
+            <span className="text-1 text-fg-3">1/3 업로드</span>
+          </div>
+          <div className="space-y-2">
+            {[
+              ["재학증명서", "업로드 완료", "done"],
+              ["성적증명서", "PDF 필요", "todo"],
+              ["가구원 동의서", "원문 첨부에서 확인", "todo"],
+            ].map(([label, value, state]) => (
+              <div key={label} className="grid min-h-[46px] grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 rounded-4 bg-page px-3">
+                {state === "done" ? (
+                  <CheckCircle2 size={18} strokeWidth={1.75} className="text-state-eligible-fg" aria-hidden />
+                ) : (
+                  <FileUp size={18} strokeWidth={1.75} className="text-fg-3" aria-hidden />
+                )}
+                <span className="min-w-0">
+                  <span className="block truncate text-2 font-[var(--font-weight-bold)] text-fg-1">{label}</span>
+                  <span className="block text-1 text-fg-3">{value}</span>
+                </span>
+                <ChevronRight size={14} strokeWidth={1.75} className="text-fg-3" aria-hidden />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+      <div className="grid grid-cols-[1fr_1.2fr] gap-2 border-t border-line-2 bg-surface px-[var(--screen-padding-x)] py-4">
+        <button className="h-11 rounded-4 border border-line-1 text-2 font-[var(--font-weight-bold)] text-fg-2">상태 변경</button>
+        <button className="h-11 rounded-4 bg-brand text-2 font-[var(--font-weight-bold)] text-fg-on-brand">서류 추가</button>
+      </div>
+    </div>
+  );
+}
+
+function ShareSummaryScreen() {
+  return (
+    <div className="relative flex h-full flex-col overflow-hidden bg-page">
+      <StatusBar />
+      <div className="px-[var(--screen-padding-x)] pb-4 pt-3 opacity-85">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-1 text-fg-3">공유</p>
+            <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">요약 만들기</h3>
+          </div>
+          <span className="grid h-10 w-10 place-items-center rounded-4 bg-brand-tint text-brand-text">
+            <Share2 size={18} strokeWidth={1.75} aria-hidden />
+          </span>
+        </div>
+
+        <section className="mt-4 rounded-5 border border-line-1 bg-surface p-4 shadow-flat">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <span className={["inline-flex rounded-pill border px-2.5 py-1 text-1 font-[var(--font-weight-bold)]", toneClass.eligible].join(" ")}>
+                자격 충족
+              </span>
+              <h4 className="mt-3 break-keep text-4 font-[var(--font-weight-bold)] leading-[26px]">
+                국가장학금 2차 신청
+              </h4>
+              <p className="mt-1 text-1 text-fg-3">마감 6월 25일 18:00 · 월 30만 원</p>
+            </div>
+            <p className="text-dday text-[34px] text-state-due-fg">D-2</p>
+          </div>
+          <div className="mt-4 rounded-4 bg-page p-3 text-1 leading-[16px] text-fg-2">
+            재학생, 소득 구간, 이수 학점 조건이 맞습니다. 원문과 첨부 링크를 같이 확인하세요.
+          </div>
+        </section>
+      </div>
+
+      <section className="absolute inset-x-0 bottom-0 rounded-t-[var(--bottom-sheet-radius-top)] border border-line-1 bg-surface px-[var(--bottom-sheet-padding-x)] pb-6 pt-3 shadow-pop">
+        <div className="mx-auto h-1.5 w-[var(--bottom-sheet-handle-width)] rounded-pill bg-line-1" />
+        <div className="mt-5 flex items-center gap-3">
+          <span className="grid h-10 w-10 place-items-center rounded-4 bg-brand-tint text-brand-text">
+            <MessageSquare size={18} strokeWidth={1.75} aria-hidden />
+          </span>
+          <div>
+            <h4 className="text-4 font-[var(--font-weight-bold)] tracking-normal">공유 범위</h4>
+            <p className="text-1 text-fg-3">개인 조건은 공유하지 않아요.</p>
+          </div>
+        </div>
+        <div className="mt-4 space-y-2">
+          {shareRows.map(([label, value], index) => (
+            <button
+              key={label}
+              className={[
+                "grid min-h-[48px] w-full grid-cols-[24px_minmax(0,1fr)_18px] items-center gap-3 rounded-4 border px-3 text-left",
+                index === 0 ? toneClass.calendar : "border-line-2 bg-page text-fg-2",
+              ].join(" ")}
+            >
+              {index === 0 ? <Link2 size={17} strokeWidth={1.75} aria-hidden /> : <Share2 size={17} strokeWidth={1.75} aria-hidden />}
+              <span className="min-w-0">
+                <span className="block text-2 font-[var(--font-weight-bold)]">{label}</span>
+                <span className="block truncate text-1 text-fg-3">{value}</span>
+              </span>
+              <ChevronRight size={14} strokeWidth={1.75} aria-hidden />
+            </button>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
