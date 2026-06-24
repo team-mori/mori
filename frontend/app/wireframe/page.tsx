@@ -10,32 +10,38 @@ import {
   CheckCircle2,
   ChevronRight,
   Clock3,
+  ExternalLink,
   FileCheck2,
   FileText,
   Filter,
   GraduationCap,
   Home,
   Info,
+  Layers3,
   ListChecks,
+  RefreshCw,
   Search,
   Settings2,
   ShieldCheck,
   Sparkles,
+  Trophy,
   UserRound,
+  WalletCards,
 } from "lucide-react";
 
-const filterChips = ["전체", "마감 임박", "장학", "비교과", "취업", "내 조건 맞음"] as const;
+const filterChips = ["전체", "마감 임박", "장학", "비교과", "취업", "공모전", "청년정책", "저장됨"] as const;
 
 const feedSummary = [
+  ["공지", "12", "saved"],
   ["충족", "5", "eligible"],
   ["확인", "2", "unknown"],
-  ["임박", "3", "due"],
 ] as const;
 
 const opportunities = [
   {
     dday: "D-2",
     category: "장학",
+    source: "학교 장학팀",
     title: "국가장학금 2차 신청 및 가구원 정보 제공 동의 안내",
     amount: "월 30만 원",
     state: "자격 충족",
@@ -45,6 +51,7 @@ const opportunities = [
   {
     dday: "D-3",
     category: "비교과",
+    source: "비교과센터",
     title: "2026 하계 글로벌 챌린지 프로그램 참가자 모집",
     amount: "해외연수",
     state: "확인 필요",
@@ -54,6 +61,7 @@ const opportunities = [
   {
     dday: "D-5",
     category: "취업",
+    source: "경력개발지원단",
     title: "반도체 직무 집중 캠프 사전 신청",
     amount: "사전등록",
     state: "자격 부족",
@@ -63,12 +71,53 @@ const opportunities = [
   {
     dday: "오늘",
     category: "학과",
+    source: "컴퓨터공학부",
     title: "컴퓨터공학부 졸업작품 중간 발표 자료 제출",
     amount: "서류 제출",
     state: "마감 임박",
     tone: "due",
     reason: "오늘 18:00까지 PDF와 발표 자료를 같이 제출해야 해요.",
   },
+  {
+    dday: "D-9",
+    category: "청년정책",
+    source: "서울청년포털",
+    title: "청년 자격증 응시료 지원 2차 모집",
+    amount: "최대 10만 원",
+    state: "추천",
+    tone: "saved",
+    reason: "취업 준비 관심사와 자격증 키워드가 맞아요.",
+  },
+] as const;
+
+const crawlSources = [
+  ["장학팀", "성공", "24건", "오늘 09:12", "eligible"],
+  ["비교과센터", "부분", "11건", "어학 조건 확인 필요", "unknown"],
+  ["경력개발지원단", "성공", "18건", "오늘 09:06", "eligible"],
+  ["학과 게시판", "실패", "0건", "원문 링크로 대체", "insufficient"],
+] as const;
+
+const pipelineSteps = [
+  ["수집", "공개 게시판 원문과 첨부를 가져와요."],
+  ["추출", "마감일, 대상, 서류, 혜택을 분리해요."],
+  ["카드화", "학생이 바로 판단할 액션카드로 바꿔요."],
+] as const;
+
+const contestRecommendations = [
+  ["K-Startup 예비창업패키지", "창업 관심 + 글로벌 챌린지 키워드", "D-18", "Trophy"],
+  ["대학생 ESG 아이디어 공모전", "비교과 활동 이력과 주제가 가까워요", "D-12", "Sparkles"],
+  ["반도체 직무 포트폴리오 챌린지", "취업 캠프와 직무 키워드가 겹쳐요", "D-21", "FileCheck2"],
+] as const;
+
+const policyRecommendations = [
+  ["청년 자격증 응시료 지원", "취업 준비 카테고리와 연결", "최대 10만 원"],
+  ["청년 월세 특별지원", "장학/생활비 공지와 함께 확인", "월 최대 20만 원"],
+] as const;
+
+const lowConfidenceItems = [
+  ["마감일", "본문에는 6월 25일, 첨부에는 6월 26일로 보여요.", "원문 확인"],
+  ["어학 점수", "자격 기준은 있지만 내 프로필 정보가 비어 있어요.", "점수 입력"],
+  ["대상 학년", "학과별 세부 조건이 첨부 PDF 안에 있어요.", "첨부 보기"],
 ] as const;
 
 const checklist = [
@@ -131,8 +180,8 @@ const postApplySteps = [
 const tokens = [
   ["Primitive", "Radix slate / ink primary / soft indigo / green / amber"],
   ["State", "eligible / insufficient / unknown / due / saved / planned"],
-  ["Mobile", "20px padding, 36px chips, 8px cards, 24px sheets"],
-  ["Type", "D-day 48-56px, tabular numbers"],
+  ["MVP1", "notice ingestion / action card / calendar / recommendations"],
+  ["Mobile", "320px min, stable phone ratio, 36px chips"],
 ] as const;
 
 type Tone = "eligible" | "insufficient" | "ineligible" | "unknown" | "due" | "saved" | "planned" | "applied" | "calendar";
@@ -159,10 +208,10 @@ export default function WireframePage() {
               MORI student mobile MVP
             </p>
             <h1 className="mt-2 text-7 font-[var(--font-weight-bold)] tracking-normal md:text-8">
-              학생에게 먼저 보여줄 모바일 와이어프레임
+              PRD 기반 학생 모바일 와이어프레임
             </h1>
             <p className="mt-3 text-3 text-fg-2">
-              기능별 레퍼런스와 토큰 감사 결과를 바탕으로, 온보딩부터 저장/신청 예정까지의 1차 MVP 흐름만 구성했습니다.
+              학교 공지 수집, 액션카드, 캘린더 저장, 공모전/청년정책 추천, 정보 부족 상태까지 MVP1 흐름을 화면으로 분리했습니다.
             </p>
           </div>
           <div className="grid min-w-[280px] gap-2 rounded-5 border border-line-1 bg-surface p-4 shadow-flat">
@@ -182,19 +231,28 @@ export default function WireframePage() {
           <PhoneFrame title="2. 홈 피드" note="Matter + Acadex">
             <HomeScreen />
           </PhoneFrame>
-          <PhoneFrame title="3. 공지 상세" note="Asana + Coinbase">
+          <PhoneFrame title="3. 수집 상태" note="source health + parser">
+            <IngestionScreen />
+          </PhoneFrame>
+          <PhoneFrame title="4. 공지 상세" note="Asana + Coinbase">
             <DetailScreen />
           </PhoneFrame>
-          <PhoneFrame title="4. 리마인더" note="Craft + Linear">
+          <PhoneFrame title="5. 캘린더 저장" note="Partiful + Up Ahead">
             <ReminderScreen />
           </PhoneFrame>
-          <PhoneFrame title="5. 내 기회" note="Going + status tabs">
+          <PhoneFrame title="6. 추천 확장" note="contextual recommendations">
+            <RecommendationScreen />
+          </PhoneFrame>
+          <PhoneFrame title="7. 정보 부족" note="low confidence fallback">
+            <LowConfidenceScreen />
+          </PhoneFrame>
+          <PhoneFrame title="8. 내 기회" note="Going + status tabs">
             <SavedScreen />
           </PhoneFrame>
-          <PhoneFrame title="6. 상태별 상세" note="Asana states + Acadex">
+          <PhoneFrame title="9. 상태별 상세" note="Asana states + Acadex">
             <StateVariantsScreen />
           </PhoneFrame>
-          <PhoneFrame title="7. 신청 후 피드백" note="Any.do + Asana calendar">
+          <PhoneFrame title="10. 신청 후 피드백" note="Any.do + Asana calendar">
             <PostApplyScreen />
           </PhoneFrame>
         </section>
@@ -353,6 +411,73 @@ function HomeScreen() {
   );
 }
 
+function IngestionScreen() {
+  return (
+    <div className="flex h-full flex-col bg-page">
+      <StatusBar />
+      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-1 text-fg-3">수집 상태</p>
+            <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">공지 53건 반영</h3>
+            <p className="mt-1 text-1 text-fg-3">마지막 크롤링 오늘 09:12</p>
+          </div>
+          <span className="grid h-10 w-10 place-items-center rounded-4 bg-brand-tint text-brand-text">
+            <RefreshCw size={17} strokeWidth={1.75} aria-hidden />
+          </span>
+        </div>
+
+        <section className="mt-4 rounded-5 border border-line-1 bg-surface p-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-3 font-[var(--font-weight-bold)]">카드 변환 파이프라인</h4>
+            <span className="text-1 text-brand-text">P0</span>
+          </div>
+          <div className="mt-4 grid gap-3">
+            {pipelineSteps.map(([label, value], index) => (
+              <div key={label} className="grid grid-cols-[28px_minmax(0,1fr)] gap-3">
+                <span className="grid h-7 w-7 place-items-center rounded-pill border border-brand-line bg-brand-tint text-1 font-[var(--font-weight-bold)] text-brand-text">
+                  {index + 1}
+                </span>
+                <span className="min-w-0 border-b border-line-2 pb-3 last:border-b-0 last:pb-0">
+                  <span className="block text-2 font-[var(--font-weight-bold)] text-fg-1">{label}</span>
+                  <span className="mt-0.5 block text-1 leading-[16px] text-fg-3">{value}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h4 className="text-3 font-[var(--font-weight-bold)]">출처별 상태</h4>
+            <span className="text-1 text-fg-3">원문 보존</span>
+          </div>
+          <div className="space-y-2">
+            {crawlSources.map(([name, state, count, updated, tone]) => (
+              <div key={name} className="rounded-5 border border-line-1 bg-surface p-3 shadow-flat">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-2 font-[var(--font-weight-bold)] text-fg-1">{name}</p>
+                    <p className="mt-1 line-clamp-1 text-1 text-fg-3">{updated}</p>
+                  </div>
+                  <span className={["shrink-0 rounded-pill border px-2 py-1 text-1 font-[var(--font-weight-bold)]", toneClass[tone as Tone]].join(" ")}>
+                    {state}
+                  </span>
+                </div>
+                <div className="mt-3 flex items-center justify-between border-t border-line-2 pt-2 text-1">
+                  <span className="text-fg-3">반영된 카드</span>
+                  <span className="font-[var(--font-weight-bold)] text-fg-1">{count}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+      <BottomNav active="탐색" />
+    </div>
+  );
+}
+
 function DetailScreen() {
   return (
     <div className="flex h-full flex-col bg-surface">
@@ -445,7 +570,7 @@ function DetailScreen() {
       </div>
       <div className="grid grid-cols-[1fr_1.2fr] gap-2 border-t border-line-2 bg-surface px-[var(--screen-padding-x)] py-4">
         <button className="h-11 rounded-4 border border-line-1 text-2 font-[var(--font-weight-bold)] text-fg-2">원문 보기</button>
-        <button className="h-11 rounded-4 bg-brand text-2 font-[var(--font-weight-bold)] text-fg-on-brand">신청 예정</button>
+        <button className="h-11 rounded-4 bg-brand text-2 font-[var(--font-weight-bold)] text-fg-on-brand">캘린더 추가</button>
       </div>
     </div>
   );
@@ -495,6 +620,142 @@ function ReminderScreen() {
               <span className="text-1">{time}</span>
             </button>
           ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function RecommendationScreen() {
+  return (
+    <div className="flex h-full flex-col bg-page">
+      <StatusBar />
+      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+        <div>
+          <p className="text-1 text-fg-3">국가장학금 상세 아래</p>
+          <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">같이 볼 기회</h3>
+          <p className="mt-1 text-1 text-fg-3">광고가 아니라 현재 공지와 이어지는 추천이에요.</p>
+        </div>
+
+        <section className="mt-4 rounded-5 border border-line-1 bg-surface p-4">
+          <div className="flex items-center gap-2">
+            <span className="grid h-8 w-8 place-items-center rounded-4 bg-brand-tint text-brand-text">
+              <Trophy size={16} strokeWidth={1.75} aria-hidden />
+            </span>
+            <div>
+              <h4 className="text-3 font-[var(--font-weight-bold)]">비슷한 공모전</h4>
+              <p className="text-1 text-fg-3">카테고리와 키워드가 겹쳐요.</p>
+            </div>
+          </div>
+          <div className="mt-3 space-y-2">
+            {contestRecommendations.map(([title, reason, dday], index) => (
+              <div key={title} className="rounded-4 border border-line-2 bg-page p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="line-clamp-1 text-2 font-[var(--font-weight-bold)] text-fg-1">{title}</p>
+                    <p className="mt-1 line-clamp-2 text-1 leading-[16px] text-fg-3">{reason}</p>
+                  </div>
+                  <span className={["shrink-0 rounded-pill border px-2 py-1 text-1 font-[var(--font-weight-bold)]", index === 0 ? toneClass.due : toneClass.saved].join(" ")}>
+                    {dday}
+                  </span>
+                </div>
+                <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
+                  <button className="h-8 rounded-3 border border-line-1 bg-surface text-1 font-[var(--font-weight-bold)] text-fg-2">캘린더</button>
+                  <button className="grid h-8 w-8 place-items-center rounded-3 bg-brand text-fg-on-brand">
+                    <ExternalLink size={14} strokeWidth={1.75} aria-label="공모전 열기" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-5 border border-brand-line bg-brand-tint p-4">
+          <div className="flex items-center gap-2">
+            <span className="grid h-8 w-8 place-items-center rounded-4 bg-surface text-brand-text">
+              <WalletCards size={16} strokeWidth={1.75} aria-hidden />
+            </span>
+            <div>
+              <h4 className="text-3 font-[var(--font-weight-bold)]">청년정책 추천</h4>
+              <p className="text-1 text-fg-3">생활비와 취업 준비를 같이 봐요.</p>
+            </div>
+          </div>
+          <div className="mt-3 space-y-2">
+            {policyRecommendations.map(([title, reason, benefit]) => (
+              <div key={title} className="rounded-4 bg-surface p-3 shadow-flat">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="line-clamp-1 text-2 font-[var(--font-weight-bold)] text-fg-1">{title}</p>
+                    <p className="mt-1 line-clamp-1 text-1 text-fg-3">{reason}</p>
+                  </div>
+                  <span className="shrink-0 text-1 font-[var(--font-weight-bold)] text-brand-text">{benefit}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+      <BottomNav active="탐색" />
+    </div>
+  );
+}
+
+function LowConfidenceScreen() {
+  return (
+    <div className="relative flex h-full flex-col overflow-hidden bg-page">
+      <StatusBar />
+      <div className="px-[var(--screen-padding-x)] pb-4 pt-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-1 text-fg-3">확인 필요</p>
+            <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">정보가 조금 더 필요해요</h3>
+          </div>
+          <span className="grid h-10 w-10 place-items-center rounded-4 bg-state-unknown-bg text-state-unknown-fg">
+            <AlertCircle size={18} strokeWidth={1.75} aria-hidden />
+          </span>
+        </div>
+
+        <section className="mt-4 rounded-5 border border-state-unknown-line bg-state-unknown-bg p-4 text-state-unknown-fg">
+          <p className="text-1 font-[var(--font-weight-bold)]">저신뢰 추출</p>
+          <h4 className="mt-1 text-4 font-[var(--font-weight-bold)] tracking-normal text-fg-1">
+            글로벌 챌린지 프로그램
+          </h4>
+          <p className="mt-2 text-1 leading-[16px] text-fg-2">
+            원문은 보존했지만 마감과 자격 일부는 확인이 필요해요. 불확실한 항목을 숨기지 않습니다.
+          </p>
+        </section>
+
+        <div className="mt-4 space-y-2">
+          {lowConfidenceItems.map(([label, value, action]) => (
+            <div key={label} className="rounded-5 border border-line-1 bg-surface p-3 shadow-flat">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-2 font-[var(--font-weight-bold)] text-fg-1">{label}</p>
+                  <p className="mt-1 line-clamp-2 text-1 leading-[16px] text-fg-3">{value}</p>
+                </div>
+                <button className="shrink-0 rounded-pill border border-line-1 px-2.5 py-1 text-1 font-[var(--font-weight-bold)] text-fg-2">
+                  {action}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <section className="absolute inset-x-0 bottom-0 rounded-t-[var(--bottom-sheet-radius-top)] border border-line-1 bg-surface px-[var(--bottom-sheet-padding-x)] pb-6 pt-3 shadow-pop">
+        <div className="mx-auto h-1.5 w-[var(--bottom-sheet-handle-width)] rounded-pill bg-line-1" />
+        <div className="mt-5 flex items-start gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-4 bg-brand-tint text-brand-text">
+            <UserRound size={18} strokeWidth={1.75} aria-hidden />
+          </span>
+          <div>
+            <h4 className="text-4 font-[var(--font-weight-bold)] tracking-normal">어학 점수만 입력할까요?</h4>
+            <p className="mt-1 text-1 leading-[16px] text-fg-3">이 항목 하나만 있으면 자격 상태를 다시 계산할 수 있어요.</p>
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-[1fr_1.2fr] gap-2">
+          <button className="h-11 rounded-4 border border-line-1 text-2 font-[var(--font-weight-bold)] text-fg-2">나중에</button>
+          <button className="h-11 rounded-4 bg-brand text-2 font-[var(--font-weight-bold)] text-fg-on-brand">입력하기</button>
         </div>
       </section>
     </div>
@@ -735,6 +996,9 @@ function OpportunityCard({ item, compact = false }: { item: (typeof opportunitie
               <span className="rounded-pill border border-line-2 bg-page px-2 py-1 text-1 font-[var(--font-weight-bold)] text-fg-2">
                 {item.category}
               </span>
+              <span className="rounded-pill border border-line-2 bg-page px-2 py-1 text-1 text-fg-3">
+                {item.source}
+              </span>
               <span className={["rounded-pill border px-2 py-1 text-1 font-[var(--font-weight-bold)]", toneClass[tone]].join(" ")}>
                 {item.state}
               </span>
@@ -749,7 +1013,7 @@ function OpportunityCard({ item, compact = false }: { item: (typeof opportunitie
         <p className="mt-3 text-1 text-fg-3">{item.reason}</p>
         {!compact && (
           <div className="mt-4 grid grid-cols-[1fr_auto] items-center gap-2">
-            <button className="h-10 rounded-4 bg-brand text-2 font-[var(--font-weight-bold)] text-fg-on-brand">신청 예정</button>
+            <button className="h-10 rounded-4 bg-brand text-2 font-[var(--font-weight-bold)] text-fg-on-brand">캘린더 추가</button>
             <button className="grid h-10 w-10 place-items-center rounded-4 border border-line-1 text-brand-text">
               <Bookmark size={16} strokeWidth={1.75} aria-label="저장" />
             </button>
