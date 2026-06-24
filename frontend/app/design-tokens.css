@@ -185,10 +185,10 @@
 :root,
 .light,
 .light-theme {
-  /* 표면(배경) — ZIP 디자인 시스템의 warm paper 톤을 semantic 레이어에 반영 */
-  --bg-page:    #fafaf7;
+  /* 표면(배경) — mobile feed는 거의 흰 표면 + 얕은 page tint */
+  --bg-page:    var(--slate-1);
   --bg-surface: #ffffff;
-  --bg-sunken:  #f4f5f7;
+  --bg-sunken:  var(--slate-2);
   --bg-inverse: var(--slate-12);
 
   /* 텍스트 */
