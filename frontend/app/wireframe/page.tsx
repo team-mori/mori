@@ -438,7 +438,7 @@ function HomeScreen() {
   return (
     <div className="flex h-full flex-col bg-page">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-3 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div className="flex items-center justify-between">
           <MoriWordmark />
           <div className="flex gap-2">
@@ -475,12 +475,12 @@ function HomeScreen() {
           ))}
         </div>
 
-        <div className="mt-4 flex gap-2 overflow-hidden">
-          {filterChips.map((chip, index) => (
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+          {filterChips.slice(0, 5).map((chip, index) => (
             <span
               key={chip}
               className={[
-                "inline-flex h-[var(--chip-height)] shrink-0 items-center rounded-pill border px-[var(--chip-padding-x)] text-2 font-[var(--font-weight-medium)]",
+                "inline-flex h-8 shrink-0 items-center rounded-pill border px-3 text-1 font-[var(--font-weight-bold)]",
                 index === 0 ? "border-brand-line bg-brand-tint text-brand-text" : "border-line-1 bg-surface text-fg-2",
               ].join(" ")}
             >
@@ -507,9 +507,10 @@ function HomeScreen() {
           </div>
         </section>
 
-        <div className="mt-4 space-y-[var(--stack-gap)]">
-          {opportunities.map((item) => (
-            <OpportunityCard key={item.title} item={item} />
+        <div className="mt-4 space-y-2">
+          <OpportunityCard item={opportunities[0]} />
+          {opportunities.slice(1, 3).map((item) => (
+            <CompactOpportunityRow key={item.title} item={item} />
           ))}
         </div>
       </div>
@@ -522,7 +523,7 @@ function IngestionScreen() {
   return (
     <div className="flex h-full flex-col bg-page">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-1 text-fg-3">수집 상태</p>
@@ -561,17 +562,17 @@ function IngestionScreen() {
           </div>
           <div className="space-y-2">
             {crawlSources.map(([name, state, count, updated, tone]) => (
-              <div key={name} className="rounded-5 border border-line-1 bg-surface p-3 shadow-flat">
+              <div key={name} className="rounded-4 border border-line-1 bg-surface px-3 py-2.5 shadow-flat">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-2 font-[var(--font-weight-bold)] text-fg-1">{name}</p>
-                    <p className="mt-1 line-clamp-1 text-1 text-fg-3">{updated}</p>
+                    <p className="line-clamp-1 text-1 text-fg-3">{updated}</p>
                   </div>
                   <span className={["shrink-0 rounded-pill border px-2 py-1 text-1 font-[var(--font-weight-bold)]", toneClass[tone as Tone]].join(" ")}>
                     {state}
                   </span>
                 </div>
-                <div className="mt-3 flex items-center justify-between border-t border-line-2 pt-2 text-1">
+                <div className="mt-2 flex items-center justify-between border-t border-line-2 pt-2 text-1">
                   <span className="text-fg-3">반영된 카드</span>
                   <span className="font-[var(--font-weight-bold)] text-fg-1">{count}</span>
                 </div>
@@ -589,7 +590,7 @@ function DetailScreen() {
   return (
     <div className="flex h-full flex-col bg-surface">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div className="flex items-center justify-between">
           <button className="grid h-[40px] w-[40px] place-items-center rounded-pill border border-line-1 bg-surface text-fg-2">
             <ChevronRight size={17} strokeWidth={1.75} className="rotate-180" aria-label="뒤로" />
@@ -599,25 +600,25 @@ function DetailScreen() {
           </span>
         </div>
 
-        <section className="mt-5 border-b border-line-2 pb-5">
+        <section className="mt-4 border-b border-line-2 pb-4">
           <p className="text-1 font-[var(--font-weight-bold)] uppercase tracking-normal text-fg-3">장학 · 학교 장학팀</p>
           <div className="mt-2 flex items-baseline gap-3">
-            <p className="text-dday text-[56px] leading-none text-state-due-fg">D-2</p>
+            <p className="text-dday text-[48px] leading-none text-state-due-fg">D-2</p>
             <div>
               <p className="text-1 font-[var(--font-weight-bold)] text-state-due-fg">마감 임박</p>
-              <p className="mt-1 text-1 text-fg-3">6월 25일 18:00</p>
+              <p className="text-1 text-fg-3">6월 25일 18:00</p>
             </div>
           </div>
-          <h3 className="mt-3 break-keep text-5 font-[var(--font-weight-bold)] leading-[28px] tracking-normal">
+          <h3 className="mt-2 break-keep text-4 font-[var(--font-weight-bold)] leading-[26px] tracking-normal">
             국가장학금 2차 신청
           </h3>
-          <div className="mt-3 flex items-baseline gap-2">
-            <p className="text-5 font-[var(--font-weight-bold)] tracking-normal text-fg-1">월 30만 원</p>
+          <div className="mt-2 flex items-baseline gap-2">
+            <p className="text-4 font-[var(--font-weight-bold)] tracking-normal text-fg-1">월 30만 원</p>
             <p className="text-1 text-fg-3">생활비 지원 가능</p>
           </div>
         </section>
 
-        <section className="mt-4 rounded-4 bg-state-eligible-bg p-4 text-state-eligible-fg">
+        <section className="mt-3 rounded-4 bg-state-eligible-bg p-3 text-state-eligible-fg">
           <div className="flex items-center gap-2">
             <CheckCircle2 size={18} strokeWidth={1.75} aria-hidden />
             <h4 className="text-3 font-[var(--font-weight-bold)]">자격 충족</h4>
@@ -627,7 +628,7 @@ function DetailScreen() {
           </p>
         </section>
 
-        <section className="border-b border-line-2 py-4">
+        <section className="border-b border-line-2 py-3">
           <div className="mb-3 flex items-center gap-2">
             <Info size={16} strokeWidth={1.75} className="text-brand-text" aria-hidden />
             <h4 className="text-3 font-[var(--font-weight-bold)]">판단 기준</h4>
@@ -642,29 +643,14 @@ function DetailScreen() {
           </div>
         </section>
 
-        <section className="border-b border-line-2 py-5">
-          <div className="mb-3 flex items-baseline justify-between">
-            <h4 className="text-3 font-[var(--font-weight-bold)]">자격 근거</h4>
-            <span className="text-1 text-state-eligible-fg">3개 충족</span>
-          </div>
-          <div>
-            {["3학년 재학 중", "소득 구간 입력 완료", "직전 학기 이수 학점 충족"].map((text) => (
-              <div key={text} className="grid min-h-[44px] grid-cols-[24px_minmax(0,1fr)] items-center gap-3 border-t border-line-2 first:border-t-0">
-                <CheckCircle2 size={18} strokeWidth={1.75} className="text-state-eligible-fg" aria-hidden />
-                <span className="text-2 text-fg-1">{text}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="py-5">
+        <section className="py-3">
           <div className="mb-3 flex items-baseline justify-between">
             <h4 className="text-3 font-[var(--font-weight-bold)]">지원 체크리스트</h4>
             <span className="text-1 text-fg-3">1/3 완료</span>
           </div>
           <div>
             {checklist.map(([title, desc, state]) => (
-              <div key={title} className="grid min-h-[64px] grid-cols-[24px_minmax(0,1fr)] gap-3 border-t border-line-2 py-3 first:border-t-0">
+              <div key={title} className="grid min-h-[48px] grid-cols-[24px_minmax(0,1fr)] gap-3 border-t border-line-2 py-2 first:border-t-0">
                 <span className={state === "done" ? "pt-0.5 text-state-eligible-fg" : "pt-0.5 text-fg-3"}>
                   {state === "done" ? <CheckCircle2 size={20} strokeWidth={1.75} /> : <FileText size={20} strokeWidth={1.75} />}
                 </span>
@@ -677,7 +663,7 @@ function DetailScreen() {
           </div>
         </section>
 
-        <section className="border-t border-line-2 py-4">
+        <section className="border-t border-line-2 py-3">
           <div className="mb-2 flex items-center justify-between">
             <h4 className="text-2 font-[var(--font-weight-bold)]">이 공지와 연결된 추천</h4>
             <span className="text-1 text-brand-text">4개</span>
@@ -760,14 +746,14 @@ function RecommendationScreen() {
   return (
     <div className="flex h-full flex-col bg-page">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div>
           <p className="text-1 text-fg-3">국가장학금 상세 아래</p>
           <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">같이 볼 기회</h3>
           <p className="mt-1 text-1 text-fg-3">광고가 아니라 현재 공지와 이어지는 추천이에요.</p>
         </div>
 
-        <section className="mt-4 rounded-5 border border-line-1 bg-surface p-4">
+        <section className="mt-4 rounded-5 border border-line-1 bg-surface p-3">
           <div className="flex items-center gap-2">
             <span className="grid h-8 w-8 place-items-center rounded-4 bg-brand-tint text-brand-text">
               <Trophy size={16} strokeWidth={1.75} aria-hidden />
@@ -778,8 +764,8 @@ function RecommendationScreen() {
             </div>
           </div>
           <div className="mt-3 space-y-2">
-            {contestRecommendations.map(([title, reason, dday], index) => (
-              <div key={title} className="rounded-4 border border-line-2 bg-page p-3">
+            {contestRecommendations.slice(0, 2).map(([title, reason, dday], index) => (
+              <div key={title} className="rounded-4 border border-line-2 bg-page p-2.5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="line-clamp-1 text-2 font-[var(--font-weight-bold)] text-fg-1">{title}</p>
@@ -789,7 +775,7 @@ function RecommendationScreen() {
                     {dday}
                   </span>
                 </div>
-                <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
+                <div className="mt-2 grid grid-cols-[1fr_auto] gap-2">
                   <button className="h-8 rounded-3 border border-line-1 bg-surface text-1 font-[var(--font-weight-bold)] text-fg-2">캘린더</button>
                   <button className="grid h-8 w-8 place-items-center rounded-3 bg-brand text-fg-on-brand">
                     <ExternalLink size={14} strokeWidth={1.75} aria-label="공모전 열기" />
@@ -800,7 +786,7 @@ function RecommendationScreen() {
           </div>
         </section>
 
-        <section className="mt-4 rounded-5 border border-brand-line bg-brand-tint p-4">
+        <section className="mt-3 rounded-5 border border-brand-line bg-brand-tint p-3">
           <div className="flex items-center gap-2">
             <span className="grid h-8 w-8 place-items-center rounded-4 bg-surface text-brand-text">
               <WalletCards size={16} strokeWidth={1.75} aria-hidden />
@@ -812,7 +798,7 @@ function RecommendationScreen() {
           </div>
           <div className="mt-3 space-y-2">
             {policyRecommendations.map(([title, reason, benefit]) => (
-              <div key={title} className="rounded-4 bg-surface p-3 shadow-flat">
+              <div key={title} className="rounded-4 bg-surface p-2.5 shadow-flat">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="line-clamp-1 text-2 font-[var(--font-weight-bold)] text-fg-1">{title}</p>
@@ -896,7 +882,7 @@ function SavedScreen() {
   return (
     <div className="flex h-full flex-col bg-page">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-1 text-fg-3">내 기회</p>
@@ -967,7 +953,7 @@ function StateVariantsScreen() {
   return (
     <div className="flex h-full flex-col bg-surface">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-1 text-fg-3">상태 검증</p>
@@ -1028,7 +1014,7 @@ function PostApplyScreen() {
   return (
     <div className="flex h-full flex-col bg-page">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div className="rounded-5 border border-state-saved-line bg-state-saved-bg p-4 text-state-saved-fg">
           <div className="flex items-start gap-3">
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-4 bg-surface">
@@ -1107,7 +1093,7 @@ function ProfileSettingsScreen() {
   return (
     <div className="flex h-full flex-col bg-page">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-1 text-fg-3">조건 관리</p>
@@ -1174,7 +1160,7 @@ function SearchFilterScreen() {
   return (
     <div className="flex h-full flex-col bg-page">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-1 text-fg-3">탐색</p>
@@ -1253,7 +1239,7 @@ function SourceChangeScreen() {
   return (
     <div className="flex h-full flex-col bg-surface">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-1 text-fg-3">원문과 변경 이력</p>
@@ -1328,7 +1314,7 @@ function FeedbackScreen() {
   return (
     <div className="flex h-full flex-col bg-page">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div>
           <p className="text-1 text-fg-3">추천 품질</p>
           <h3 className="text-5 font-[var(--font-weight-bold)] tracking-normal">피드백 반영</h3>
@@ -1389,7 +1375,7 @@ function ApplicationStatusScreen() {
   return (
     <div className="flex h-full flex-col bg-page">
       <StatusBar />
-      <div className="flex-1 overflow-hidden px-[var(--screen-padding-x)] pb-4 pt-3">
+      <div className="flex-1 overflow-y-auto px-[var(--screen-padding-x)] pb-5 pt-3">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-1 text-fg-3">신청 관리</p>
@@ -1588,6 +1574,27 @@ function OpportunityCard({ item, compact = false }: { item: (typeof opportunitie
         )}
       </div>
     </article>
+  );
+}
+
+function CompactOpportunityRow({ item }: { item: (typeof opportunities)[number] }) {
+  const tone = item.tone as Tone;
+  return (
+    <button className="grid min-h-[64px] w-full grid-cols-[minmax(0,1fr)_52px] items-center gap-3 rounded-4 border border-line-1 bg-surface px-3 py-2 text-left shadow-flat">
+      <span className="min-w-0">
+        <span className="flex items-center gap-1.5">
+          <span className={["rounded-pill border px-2 py-0.5 text-1 font-[var(--font-weight-bold)]", toneClass[tone]].join(" ")}>
+            {item.state}
+          </span>
+          <span className="truncate text-1 text-fg-3">{item.category}</span>
+        </span>
+        <span className="mt-1 block truncate text-2 font-[var(--font-weight-bold)] text-fg-1">{item.title}</span>
+      </span>
+      <span className="text-right">
+        <span className="block text-dday text-[22px] leading-none text-state-due-fg">{item.dday}</span>
+        <span className="block truncate text-1 text-fg-3">{item.amount}</span>
+      </span>
+    </button>
   );
 }
 
