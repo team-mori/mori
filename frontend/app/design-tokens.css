@@ -99,12 +99,12 @@
   --radius-thumb: 9999px;
 
   /* 섀도 (Radix Themes shadow-1..6, 그대로) */
-  --shadow-1: inset 0 0 0 1px var(--gray-a5), inset 0 1.5px 2px 0 var(--gray-a2), inset 0 1.5px 2px 0 var(--black-a2);
-  --shadow-2: 0 0 0 1px var(--gray-a3), 0 0 0 0.5px var(--black-a1), 0 1px 1px 0 var(--gray-a2), 0 2px 1px -1px var(--black-a1), 0 1px 3px 0 var(--black-a1);
-  --shadow-3: 0 0 0 1px var(--gray-a3), 0 2px 3px -2px var(--gray-a3), 0 3px 12px -4px var(--black-a2), 0 4px 16px -8px var(--black-a2);
-  --shadow-4: 0 0 0 1px var(--gray-a3), 0 8px 40px var(--black-a1), 0 12px 32px -16px var(--gray-a3);
-  --shadow-5: 0 0 0 1px var(--gray-a3), 0 12px 60px var(--black-a3), 0 12px 32px -16px var(--gray-a5);
-  --shadow-6: 0 0 0 1px var(--gray-a3), 0 12px 60px var(--black-a3), 0 16px 64px var(--gray-a2), 0 16px 36px -20px var(--gray-a7);
+  --shadow-1: 0 0 0 1px rgba(15, 23, 42, 0.04);
+  --shadow-2: 0 1px 2px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(15, 23, 42, 0.04);
+  --shadow-3: 0 2px 6px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(15, 23, 42, 0.05);
+  --shadow-4: 0 8px 24px -14px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.05);
+  --shadow-5: 0 12px 32px -12px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.06);
+  --shadow-6: 0 16px 44px -16px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.06);
 }
 
 [data-scaling="90%"]  { --scaling: 0.9; }
@@ -192,40 +192,40 @@
   --bg-inverse: var(--slate-12);
 
   /* 텍스트 */
-  --fg-1: var(--slate-12);  /* 본문·제목 (고대비) */
-  --fg-2: var(--slate-11);  /* 보조 텍스트 */
-  --fg-3: var(--slate-10);  /* 약한 텍스트 */
-  --fg-4: var(--slate-9);   /* placeholder·disabled */
+  --fg-1: #2b3a55;  /* 본문·제목 (midnight ink) */
+  --fg-2: #475569;  /* 보조 텍스트 */
+  --fg-3: #64748b;  /* 약한 텍스트 */
+  --fg-4: #94a3b8;  /* placeholder·disabled */
   --on-brand: #fff;         /* solid 브랜드 위 텍스트 (고정 대비색) */
 
   /* 테두리 */
-  --line-2:      var(--slate-4);  /* 미세 구분선 */
-  --line-1:      var(--slate-5);  /* 기본 테두리 */
-  --line-strong: var(--slate-7);  /* 강조 테두리 */
+  --line-2:      #eef1f5;  /* 미세 구분선 */
+  --line-1:      #e2e8f0;  /* 기본 테두리 */
+  --line-strong: #cbd5e1;  /* 강조 테두리 */
 
   /* 브랜드 — CTA는 ink, 선택/정보 강조는 soft indigo */
-  --brand:       var(--slate-12);   /* solid primary action */
-  --brand-deep:  var(--slate-11);   /* hover/active */
-  --brand-text:  var(--indigo-11);  /* 링크·선택 텍스트 */
-  --brand-tint:  var(--indigo-2);   /* 옅은 브랜드 배경 */
-  --brand-line:  var(--indigo-5);   /* 브랜드 tint 테두리 */
+  --brand:       #2b3a55;   /* solid primary action */
+  --brand-deep:  #1f2937;   /* hover/active */
+  --brand-text:  #2b3a55;   /* 링크·선택 텍스트 */
+  --brand-tint:  #e5eaf1;   /* 옅은 브랜드 배경 */
+  --brand-line:  #cbd5e1;   /* 브랜드 tint 테두리 */
 
   /* 상태 시맨틱 — 자격·마감 */
   --eligible-fg:   var(--green-11);  --eligible-bg:   var(--green-2);  --eligible-line:   var(--green-5);
   --due-soon-fg:   var(--amber-11);  --due-soon-bg:   var(--amber-2);  --due-soon-line:   var(--amber-5);
   --ineligible-fg: var(--slate-11);  --ineligible-bg: var(--slate-3);  --ineligible-line: var(--slate-6);
-  --state-new-fg:  var(--indigo-11); --state-new-bg:  var(--indigo-2);
+  --state-new-fg:  #2b3a55; --state-new-bg:  #e5eaf1;
 
   /* MORI 학생 MVP 상태 — Primer식 fg/bg/line triplet */
   --state-eligible-fg: var(--eligible-fg);       --state-eligible-bg: var(--eligible-bg);       --state-eligible-line: var(--eligible-line);
   --state-insufficient-fg: var(--amber-11);      --state-insufficient-bg: var(--amber-2);       --state-insufficient-line: var(--amber-5);
   --state-ineligible-fg: var(--ineligible-fg);   --state-ineligible-bg: var(--ineligible-bg);   --state-ineligible-line: var(--ineligible-line);
-  --state-unknown-fg: var(--slate-11);          --state-unknown-bg: var(--slate-2);            --state-unknown-line: var(--slate-5);
+  --state-unknown-fg: #2b3a55;                 --state-unknown-bg: #e5eaf1;                   --state-unknown-line: #cbd5e1;
   --state-due-soon-fg: var(--due-soon-fg);       --state-due-soon-bg: var(--due-soon-bg);       --state-due-soon-line: var(--due-soon-line);
-  --state-saved-fg: var(--indigo-11);           --state-saved-bg: var(--indigo-2);             --state-saved-line: var(--indigo-5);
-  --state-planned-fg: var(--slate-12);          --state-planned-bg: var(--slate-2);            --state-planned-line: var(--slate-5);
+  --state-saved-fg: #2b3a55;                   --state-saved-bg: #e5eaf1;                     --state-saved-line: #cbd5e1;
+  --state-planned-fg: #2b3a55;                 --state-planned-bg: #f4f5f7;                   --state-planned-line: #e2e8f0;
   --state-applied-fg: var(--green-11);          --state-applied-bg: var(--green-2);            --state-applied-line: var(--green-5);
-  --state-calendar-fg: var(--indigo-11);        --state-calendar-bg: var(--indigo-2);          --state-calendar-line: var(--indigo-5);
+  --state-calendar-fg: #2b3a55;                --state-calendar-bg: #e5eaf1;                  --state-calendar-line: #cbd5e1;
 
   /* MORI 학생 모바일 컴포넌트 */
   --screen-padding-x: 20px;
